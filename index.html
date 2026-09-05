@@ -1734,6 +1734,22 @@ const cards=new Map(), data=new Map();
 let poll=null;
 function fmt(s){ if(s==null) return '—'; const m=Math.floor(s/60), x=Math.round(s%60).toString().padStart(2,'0'); return m+':'+x; }
 
+function wireAudioFallback(a,t){
+  if(!a||a.dataset.fallbackWired==='1')return;
+  a.dataset.fallbackWired='1';
+  const urls=[t.audioUrl,t.streamAudioUrl,t.sourceAudioUrl].filter(Boolean).filter((v,i,x)=>x.indexOf(v)===i);
+  let pos=Math.max(0,urls.indexOf(a.currentSrc||a.src)); if(pos<0)pos=0;
+  a.addEventListener('error',()=>{
+    if(pos+1<urls.length){
+      pos++; a.src=urls[pos]; a.load();
+    }else{
+      a.dataset.audioError='1';
+      const card=a.closest('.track'); if(card){const tg=card.querySelector('.tg');if(tg&&!tg.dataset.orig){tg.dataset.orig=tg.textContent||'';tg.textContent=(tg.textContent?tg.textContent+' · ':'')+'⚠ Không mở được nguồn âm thanh — thử nút Tải MP3/mở lại bài.';}}
+    }
+  });
+  a.addEventListener('loadedmetadata',()=>{a.dataset.audioError='';});
+}
+
 function addTrack(t){
   const url=t.audioUrl||t.streamAudioUrl||''; if(!url) return;
   data.set(t.id,t);
@@ -1746,11 +1762,15 @@ function addTrack(t){
   }
   let c=cards.get(t.id);
   if(c){
+    // Không để sự kiện đồng bộ Firebase/IndexedDB ghi đè nguồn Kie.ai đang phát tốt trong phiên hiện tại.
+    // Bản restore chỉ được cập nhật một card đã restore; card live luôn giữ nguồn live cho tới khi người dùng tải lại trang.
+    if(t.__restored && c.dataset.restored!=='1') return;
     if(t.__restored)c.dataset.restored='1';
     if(c.dataset.u===url && c.dataset.f===String(!!t.audioUrl)) return;
     c.dataset.u=url; c.dataset.f=String(!!t.audioUrl);
     const a=c.querySelector('audio');
-    if(a.getAttribute('src')!==url){ const p=!a.paused; a.src=url; if(p)a.play().catch(()=>{}); }
+    if(a.getAttribute('src')!==url){ const p=!a.paused; a.src=url; a.load(); if(p)a.play().catch(()=>{}); }
+    wireAudioFallback(a,t);
     const dl=c.querySelector('.dl');
     if(t.audioUrl){ dl.href=t.audioUrl; dl.classList.remove('off'); dl.textContent='Tải MP3'; dl.setAttribute('download',''); dl.target='_blank'; dl.rel='noopener'; }
     if(t.imageUrl){ const cv=c.querySelector('.cover'); cv.style.backgroundImage="url('"+t.imageUrl+"')"; cv.textContent=''; }
@@ -1766,7 +1786,7 @@ function addTrack(t){
   const info=document.createElement('div'); info.style.minWidth='0';
   const h=document.createElement('h4'); h.textContent=t.title||'Không tên';
   const tg=document.createElement('div'); tg.className='tg'; tg.textContent=t.tags||'';
-  const au=document.createElement('audio'); au.controls=true; au.preload='none'; au.src=url;
+  const au=document.createElement('audio'); au.controls=true; au.preload='metadata'; au.setAttribute('playsinline',''); au.src=url; wireAudioFallback(au,t);
   info.appendChild(h); info.appendChild(tg); info.appendChild(au);
 
   const act=document.createElement('div'); act.className='tact';
@@ -2714,15 +2734,38 @@ window.StudioVault = (function(){
   function saveIdx(a){try{localStorage.setItem(K_IDX,JSON.stringify(a));}catch(e){}}
   let emitT=null;function emit(){clearTimeout(emitT);emitT=setTimeout(()=>listeners.forEach(f=>{try{f();}catch(e){}}),180);}
 
-  async function fetchBlob(url){
-    if(String(url||'').startsWith('blob:')){const r=await fetch(url);if(r.ok)return r.blob();}
+  async function isPlayableAudioBlob(blob){
+    if(!blob||!blob.size)return false;
+    const type=String(blob.type||'').toLowerCase();
+    if(type.startsWith('audio/'))return true;
+    // Một số CDN trả MP3 dưới application/octet-stream; kiểm tra magic bytes trước khi chấp nhận.
+    try{
+      const b=new Uint8Array(await blob.slice(0,16).arrayBuffer());
+      const ascii=String.fromCharCode(...b);
+      if(ascii.startsWith('ID3'))return true;
+      if(b.length>=2 && b[0]===0xFF && (b[1]&0xE0)===0xE0)return true; // MPEG audio frame
+      if(ascii.startsWith('OggS'))return true;
+      if(ascii.startsWith('RIFF') && ascii.slice(8,12)==='WAVE')return true;
+      if(b.length>=12 && ascii.slice(4,8)==='ftyp')return true; // M4A/MP4 audio container
+    }catch(e){}
+    return false;
+  }
+  async function fetchBlob(url,expectAudio){
+    if(String(url||'').startsWith('blob:')){
+      const r=await fetch(url);if(r.ok){const b=await r.blob();if(!expectAudio||await isPlayableAudioBlob(b))return b;throw new Error('Blob audio không hợp lệ');}
+    }
     const tries=[url,'https://corsproxy.io/?url='+encodeURIComponent(url),'https://api.allorigins.win/raw?url='+encodeURIComponent(url)];let last=null;
-    for(const u of tries){try{const r=await fetch(u,{mode:'cors'});if(!r.ok)throw new Error('HTTP '+r.status);const b=await r.blob();if(b&&b.size>0)return b;throw new Error('File rỗng');}catch(e){last=e;}}
+    for(const u of tries){try{
+      const r=await fetch(u,{mode:'cors'});if(!r.ok)throw new Error('HTTP '+r.status);
+      const b=await r.blob();if(!b||!b.size)throw new Error('File rỗng');
+      if(expectAudio && !(await isPlayableAudioBlob(b)))throw new Error('Nguồn trả về không phải file âm thanh');
+      return b;
+    }catch(e){last=e;}}
     throw last||new Error('Không tải được file');
   }
   async function cache(entry){if(!entry||!entry.url||inflight.has(entry.id))return;inflight.add(entry.id);try{await doCache(entry);}finally{inflight.delete(entry.id);}}
   async function doCache(entry){
-    if(!entry.url)return;try{const b=await fetchBlob(entry.url);await putBlob(entry.id,b,b.type);const a=idx(),i=a.findIndex(x=>x.id===entry.id);if(i>=0){a[i].offline=true;a[i].size=b.size;a[i].mime=b.type;saveIdx(a);emit();}}catch(e){}
+    if(!entry.url)return;try{const b=await fetchBlob(entry.url,entry.kind==='music');await putBlob(entry.id,b,b.type);const a=idx(),i=a.findIndex(x=>x.id===entry.id);if(i>=0){a[i].offline=true;a[i].size=b.size;a[i].mime=b.type;saveIdx(a);emit();}}catch(e){}
     if(entry.cover){try{const c=await fetchBlob(entry.cover);await putBlob(entry.id+'#cover',c,c.type);const a=idx(),i=a.findIndex(x=>x.id===entry.id);if(i>=0){a[i].coverOffline=true;saveIdx(a);emit();}}catch(e){}}
   }
   function upsertLocal(entry){
@@ -2742,7 +2785,7 @@ window.StudioVault = (function(){
     try{
       await Cloud.init();
       let b=blob||null,c=coverBlob||null;
-      if(!b)b=await fetchBlob(entry.url);
+      if(!b)b=await fetchBlob(entry.url,entry.kind==='music');
       if(!c&&entry.cover){try{c=await fetchBlob(entry.cover);}catch(e){}}
       const a=idx(),i=a.findIndex(x=>x.id===entry.id);if(i>=0){a[i].cloudPending=true;a[i].cloudError='';saveIdx(a);emit();}
       const remote=await Cloud.uploadBlob(entry,b,c,onProgress);
@@ -2777,10 +2820,25 @@ window.StudioVault = (function(){
     if(before&&before.cloud&&Cloud){try{await Cloud.removeItem(before);}catch(e){throw new Error('Đã xóa trên máy nhưng Firebase chưa xóa được: '+(e.message||e));}}
   }
   async function clear(kind){const gone=idx().filter(x=>!kind||x.kind===kind);for(const g of gone)await remove(g.id);}
-  async function srcOf(id,which){const key=which==='cover'?id+'#cover':id;if(objUrls.has(key))return objUrls.get(key);try{const rec=await getBlob(key);if(rec&&rec.blob){const u=URL.createObjectURL(rec.blob);objUrls.set(key,u);return u;}}catch(e){}const e=get(id);return e?(which==='cover'?(e.cover||''):(e.url||'')):'';}
+  async function srcOf(id,which){
+    const key=which==='cover'?id+'#cover':id;if(objUrls.has(key))return objUrls.get(key);
+    const meta=get(id);
+    try{
+      const rec=await getBlob(key);
+      if(rec&&rec.blob){
+        if(which!=='cover' && meta&&meta.kind==='music' && !(await isPlayableAudioBlob(rec.blob))){
+          await delBlob(key).catch(()=>{});
+          const a=idx(),i=a.findIndex(x=>x.id===id);if(i>=0){a[i].offline=false;saveIdx(a);}
+        }else{
+          const u=URL.createObjectURL(rec.blob);objUrls.set(key,u);return u;
+        }
+      }
+    }catch(e){}
+    return meta?(which==='cover'?(meta.cover||''):(meta.url||'')):'';
+  }
   async function totalSize(){return idx().reduce((n,x)=>n+(x.size||0),0);}
   function onChange(fn){listeners.push(fn);}
-  async function download(id,filename){const e=get(id);if(!e)throw new Error('Không tìm thấy file.');let blob=null;try{const rec=await getBlob(id);if(rec&&rec.blob)blob=rec.blob;}catch(e){}if(!blob){const u=e.url;if(!u)throw new Error('File chưa có URL tải.');blob=await fetchBlob(u);}const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=filename||e.filename||e.title||'download';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);}
+  async function download(id,filename){const e=get(id);if(!e)throw new Error('Không tìm thấy file.');let blob=null;try{const rec=await getBlob(id);if(rec&&rec.blob)blob=rec.blob;}catch(e){}if(!blob){const u=e.url;if(!u)throw new Error('File chưa có URL tải.');blob=await fetchBlob(u,e.kind==='music');}const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=filename||e.filename||e.title||'download';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);}
   async function syncCloud(){
     if(!Cloud)throw new Error('Firebase chưa được cấu hình.');await Cloud.init();
     const items=idx().filter(x=>!x.cloud&&!x.cloudPending&&x.kind!=='sfx');let done=0;
