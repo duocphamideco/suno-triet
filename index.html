@@ -3693,7 +3693,7 @@ window.KieCredit = (function(){
 <div class="mvx-panel on" data-body="media"><h3>Ảnh & Video</h3><div class="mvx-stack"><button class="mvx-btn primary" id="mvxAddVisual">＋ Ảnh / video từ máy</button><button class="mvx-btn" id="mvxLoadImages">▧ Ảnh đã tạo</button><button class="mvx-btn" id="mvxAddOverlay">＋ Ảnh overlay</button></div><input class="mvx-file" id="mvxVisualFile" type="file" accept="image/*,video/*" multiple><input class="mvx-file" id="mvxOverlayFile" type="file" accept="image/*" multiple><div class="mvx-sub">Kho ảnh</div><div class="mvx-vault" id="mvxImageVault"><div class="mvx-note">Bấm “Ảnh đã tạo” để xem.</div></div><div class="mvx-note" id="mvxMediaNote">Media mới chèn tại playhead và phải hiện ngay preview. Mẹo: có thể kéo ảnh từ Kho ảnh xuống timeline.</div></div>
 <div class="mvx-panel" data-body="text"><h3>Text theo thời gian</h3><label class="mvx-field"><span>Nội dung</span><textarea id="mvxNewText">Nhập chữ</textarea></label><button class="mvx-btn primary" id="mvxAddText">＋ Thêm text tại playhead</button><div class="mvx-note">Text tạo thành clip riêng trên track TEXT. Kéo clip để đổi thời điểm, kéo mép để đổi thời lượng.</div></div>
 <div class="mvx-panel" data-body="audio"><h3>Nhạc & Audio</h3><div class="mvx-stack"><button class="mvx-btn primary" id="mvxMainAudio">🎵 Nhạc chính từ máy</button><button class="mvx-btn" id="mvxLoadMusic">♫ Lấy nhạc từ bài vừa tạo</button><button class="mvx-btn" id="mvxExtraAudio">＋ Audio phụ tại playhead</button></div><input class="mvx-file" id="mvxMainAudioFile" type="file" accept="audio/*"><input class="mvx-file" id="mvxExtraAudioFile" type="file" accept="audio/*" multiple><div class="mvx-sub">Sound Effect nhanh</div><div class="mvx-sfx-grid" id="mvxSfxGrid"><button class="mvx-sfx" data-sfx="whoosh"><b>💨 Whoosh</b><small>Chuyển cảnh</small></button><button class="mvx-sfx" data-sfx="impact"><b>💥 Impact</b><small>Nhấn cao trào</small></button><button class="mvx-sfx" data-sfx="riser"><b>📈 Riser</b><small>Dẫn vào chorus</small></button><button class="mvx-sfx" data-sfx="chime"><b>🔔 Chime</b><small>Reveal / sparkle</small></button><button class="mvx-sfx" data-sfx="shutter"><b>📷 Shutter</b><small>Photo cut</small></button><button class="mvx-sfx" data-sfx="rain"><b>🌧 Rain</b><small>Ambience 5s</small></button></div><div class="mvx-sub">Kho nhạc</div><div class="mvx-vault" id="mvxMusicVault"><div class="mvx-note">Bấm “Lấy nhạc từ bài vừa tạo” để chọn đúng bài đang có ở giao diện tạo nhạc.</div></div><div class="mvx-note" id="mvxAudioNote">File dài sẽ tự mở rộng dự án. Dùng FIT PROJECT để quản lý toàn bộ. Có thể kéo bài nhạc hoặc SFX xuống timeline.</div></div>
-<div class="mvx-panel" data-body="fx"><h3>Template & Hiệu ứng</h3><div class="mvx-preset-grid" id="mvxPresets"><button class="mvx-preset on" data-preset="cinematic"><b>🎞 Cinematic</b><small>Ken Burns · vignette · grain · dissolve</small></button><button class="mvx-preset" data-preset="romance"><b>💗 Romance</b><small>Bokeh · glow · light leak</small></button><button class="mvx-preset" data-preset="rain"><b>🌧 Rain Memory</b><small>Mưa · vignette · film grain</small></button><button class="mvx-preset" data-preset="dreamy"><b>✨ Dreamy</b><small>Bokeh · snow · glow · flare</small></button><button class="mvx-preset" data-preset="vintage"><b>📽 Vintage Film</b><small>Sepia · dust · grain · scanlines</small></button><button class="mvx-preset" data-preset="golden"><b>🌇 Golden Glow</b><small>Warm leak · flare · glow</small></button><button class="mvx-preset" data-preset="neon"><b>🌈 Neon Pulse</b><small>Color wash · flash · glow</small></button><button class="mvx-preset" data-preset="noir"><b>◐ Noir</b><small>Mono · contrast · vignette</small></button><button class="mvx-preset" data-preset="vhs"><b>📼 Retro VHS</b><small>Scanlines · grain · color pulse</small></button><button class="mvx-preset" data-preset="stage"><b>🎤 Live Stage</b><small>Spotlight · sparkle · glow · pulse</small></button><button class="mvx-preset" data-preset="soft"><b>🌌 Soft Aurora</b><small>Aurora · glow · bokeh · light leak</small></button><button class="mvx-preset" data-preset="proshow"><b>🖼 ProShow</b><small>Ảnh động kiểu slideshow · dissolve · pan zoom</small></button><button class="mvx-preset" data-preset="elegant"><b>💎 Elegant Fade</b><small>Tan biến nhẹ · glow · leak</small></button><button class="mvx-preset" data-preset="clean"><b>◻ Clean</b><small>Dissolve sạch · không overlay FX</small></button></div><div class="mvx-sub">Tinh chỉnh FX</div><div class="mvx-fx-grid" id="mvxFxGrid"><button class="mvx-fxbtn on" data-fx="kenburns">Ken Burns</button><button class="mvx-fxbtn on" data-fx="vignette">Vignette</button><button class="mvx-fxbtn on" data-fx="grain">Film Grain</button><button class="mvx-fxbtn" data-fx="bokeh">Bokeh</button><button class="mvx-fxbtn" data-fx="rain">Rain</button><button class="mvx-fxbtn" data-fx="snow">Snow</button><button class="mvx-fxbtn" data-fx="lightleak">Light Leak</button><button class="mvx-fxbtn" data-fx="glow">Glow</button><button class="mvx-fxbtn" data-fx="flare">Lens Flare</button><button class="mvx-fxbtn" data-fx="dust">Film Dust</button><button class="mvx-fxbtn" data-fx="colorwash">Color Wash</button><button class="mvx-fxbtn" data-fx="scanlines">VHS Lines</button><button class="mvx-fxbtn" data-fx="flash">Beat Flash</button><button class="mvx-fxbtn" data-fx="sepia">Sepia</button><button class="mvx-fxbtn" data-fx="mono">Mono</button><button class="mvx-fxbtn" data-fx="sparkles">Sparkles</button><button class="mvx-fxbtn" data-fx="aurora">Aurora</button><button class="mvx-fxbtn" data-fx="bars">Cinema Bars</button></div><label class="mvx-field" style="margin-top:10px"><span>Cường độ hiệu ứng</span><div class="mvx-range"><input type="range" id="mvxFxIntensity" min="0" max="100" value="55"><output id="mvxFxIntensityOut">55%</output></div></label><div class="mvx-grid2"><label class="mvx-field"><span>Transition</span><select id="mvxTransition"><option value="crossfade" selected>Cross Dissolve</option><option value="fadewhite">Fade White</option><option value="fadeblack">Fade Black</option><option value="zoom">Zoom Dissolve</option><option value="wipeleft">Wipe Left</option><option value="wiperight">Wipe Right</option><option value="flashcut">Flash Cut</option><option value="none">Không transition</option></select></label><label class="mvx-field"><span>Thời lượng transition</span><input type="number" id="mvxTransitionDur" min="0" max="2" step="0.1" value="0.45"></label></div><div class="mvx-fx-status" id="mvxFxStatus">Cinematic đang áp dụng. Preview và file xuất dùng cùng engine FX.</div></div><div class="mvx-panel" data-body="export"><h3>Xuất MV</h3><label class="mvx-field"><span>Chất lượng</span><select id="mvxQuality"><option value="hd">HD 720p</option><option value="fhd" selected>Full HD 1080p</option><option value="2k">2K 1440p</option><option value="4k">4K 2160p · máy mạnh</option></select></label><label class="mvx-field"><span>FPS</span><select id="mvxFps"><option value="30" selected>30 FPS</option><option value="60">60 FPS</option></select></label><div class="mvx-note" id="mvxRes">1920 × 1080</div><button class="mvx-btn primary" id="mvxExport" style="width:100%">⬇ Xuất video</button><a class="mvx-btn hide" id="mvxDownloadLast" href="#" download style="width:100%;margin-top:7px;text-align:center;text-decoration:none;display:block">⬇ Tải video vừa render</a><div class="mvx-note" id="mvxExportNote">Xuất video chạy bằng render riêng: tự dựng từ đầu đến cuối mà không reset playhead/preview. Bạn vẫn có thể Play/Pause, chọn clip và thao tác giao diện trong lúc xuất.</div><div class="mvx-export-note">Xuất MP4/H.264 + AAC bắt buộc. Nếu trình duyệt không hỗ trợ MP4 trực tiếp, ứng dụng sẽ báo lỗi và KHÔNG xuất WebM thay thế.</div></div></aside>
+<div class="mvx-panel" data-body="fx"><h3>Template & Hiệu ứng</h3><div class="mvx-preset-grid" id="mvxPresets"><button class="mvx-preset on" data-preset="cinematic"><b>🎞 Cinematic</b><small>Ken Burns · vignette · grain · dissolve</small></button><button class="mvx-preset" data-preset="romance"><b>💗 Romance</b><small>Bokeh · glow · light leak</small></button><button class="mvx-preset" data-preset="rain"><b>🌧 Rain Memory</b><small>Mưa · vignette · film grain</small></button><button class="mvx-preset" data-preset="dreamy"><b>✨ Dreamy</b><small>Bokeh · snow · glow · flare</small></button><button class="mvx-preset" data-preset="vintage"><b>📽 Vintage Film</b><small>Sepia · dust · grain · scanlines</small></button><button class="mvx-preset" data-preset="golden"><b>🌇 Golden Glow</b><small>Warm leak · flare · glow</small></button><button class="mvx-preset" data-preset="neon"><b>🌈 Neon Pulse</b><small>Color wash · flash · glow</small></button><button class="mvx-preset" data-preset="noir"><b>◐ Noir</b><small>Mono · contrast · vignette</small></button><button class="mvx-preset" data-preset="vhs"><b>📼 Retro VHS</b><small>Scanlines · grain · color pulse</small></button><button class="mvx-preset" data-preset="stage"><b>🎤 Live Stage</b><small>Spotlight · sparkle · glow · pulse</small></button><button class="mvx-preset" data-preset="soft"><b>🌌 Soft Aurora</b><small>Aurora · glow · bokeh · light leak</small></button><button class="mvx-preset" data-preset="proshow"><b>🖼 ProShow</b><small>Ảnh động kiểu slideshow · dissolve · pan zoom</small></button><button class="mvx-preset" data-preset="elegant"><b>💎 Elegant Fade</b><small>Tan biến nhẹ · glow · leak</small></button><button class="mvx-preset" data-preset="clean"><b>◻ Clean</b><small>Dissolve sạch · không overlay FX</small></button></div><div class="mvx-sub">Tinh chỉnh FX</div><div class="mvx-fx-grid" id="mvxFxGrid"><button class="mvx-fxbtn on" data-fx="kenburns">Ken Burns</button><button class="mvx-fxbtn on" data-fx="vignette">Vignette</button><button class="mvx-fxbtn on" data-fx="grain">Film Grain</button><button class="mvx-fxbtn" data-fx="bokeh">Bokeh</button><button class="mvx-fxbtn" data-fx="rain">Rain</button><button class="mvx-fxbtn" data-fx="snow">Snow</button><button class="mvx-fxbtn" data-fx="lightleak">Light Leak</button><button class="mvx-fxbtn" data-fx="glow">Glow</button><button class="mvx-fxbtn" data-fx="flare">Lens Flare</button><button class="mvx-fxbtn" data-fx="dust">Film Dust</button><button class="mvx-fxbtn" data-fx="colorwash">Color Wash</button><button class="mvx-fxbtn" data-fx="scanlines">VHS Lines</button><button class="mvx-fxbtn" data-fx="flash">Beat Flash</button><button class="mvx-fxbtn" data-fx="sepia">Sepia</button><button class="mvx-fxbtn" data-fx="mono">Mono</button><button class="mvx-fxbtn" data-fx="sparkles">Sparkles</button><button class="mvx-fxbtn" data-fx="aurora">Aurora</button><button class="mvx-fxbtn" data-fx="bars">Cinema Bars</button></div><label class="mvx-field" style="margin-top:10px"><span>Cường độ hiệu ứng</span><div class="mvx-range"><input type="range" id="mvxFxIntensity" min="0" max="100" value="55"><output id="mvxFxIntensityOut">55%</output></div></label><div class="mvx-grid2"><label class="mvx-field"><span>Transition</span><select id="mvxTransition"><option value="crossfade" selected>Cross Dissolve</option><option value="fadewhite">Fade White</option><option value="fadeblack">Fade Black</option><option value="zoom">Zoom Dissolve</option><option value="wipeleft">Wipe Left</option><option value="wiperight">Wipe Right</option><option value="flashcut">Flash Cut</option><option value="none">Không transition</option></select></label><label class="mvx-field"><span>Thời lượng transition</span><input type="number" id="mvxTransitionDur" min="0" max="2" step="0.1" value="0.45"></label></div><div class="mvx-fx-status" id="mvxFxStatus">Cinematic đang áp dụng. Preview và file xuất dùng cùng engine FX.</div></div><div class="mvx-panel" data-body="export"><h3>Xuất MV</h3><label class="mvx-field"><span>Chất lượng</span><select id="mvxQuality"><option value="hd">HD 720p</option><option value="fhd" selected>Full HD 1080p</option><option value="2k">2K 1440p</option><option value="4k">4K 2160p · máy mạnh</option></select></label><label class="mvx-field"><span>FPS</span><select id="mvxFps"><option value="30" selected>30 FPS</option><option value="60">60 FPS</option></select></label><div class="mvx-note" id="mvxRes">1920 × 1080</div><button class="mvx-btn primary" id="mvxExport" style="width:100%">⬇ Xuất video</button><a class="mvx-btn hide" id="mvxDownloadLast" href="#" download style="width:100%;margin-top:7px;text-align:center;text-decoration:none;display:block">⬇ Tải video vừa render</a><div class="mvx-note" id="mvxExportNote">MP4 FRAME-BY-FRAME theo TRIET-STUDIO: từng frame được mã hóa bằng WebCodecs H.264, audio mix riêng bằng AAC rồi mux thẳng thành MP4. Không dùng MediaRecorder realtime.</div><div class="mvx-export-note">Xuất MP4/H.264 + AAC bắt buộc. Sau khi render, ứng dụng tự remux fMP4 thành MP4 chuẩn Fast Start để hình + tiếng tương thích tốt với Windows và điện thoại. Lần đầu cần tải bộ chuẩn hóa khoảng 31 MB.</div></div></aside>
 <main class="mvx-preview"><div class="mvx-previewbar"><div><div class="mvx-ratios" id="mvxRatios"><button class="on" data-r="16x9">16:9</button><button data-r="9x16">9:16</button><button data-r="1x1">1:1</button><button data-r="2x3">2:3</button></div><span class="mvx-fx-badge" id="mvxFxBadge">FX · Cinematic</span></div><div><button class="mvx-minibtn" id="mvxFit">Fit</button> <button class="mvx-minibtn" id="mvxFill">Fill</button> <button class="mvx-minibtn" id="mvxReset">Reset</button></div></div><div class="mvx-stagezone"><div class="mvx-stage" id="mvxStage"><canvas id="mvxCanvas" width="1280" height="720"></canvas><div class="mvx-box" id="mvxBox"><span class="lab" id="mvxBoxLab">CLIP</span><i class="h nw" data-h="nw"></i><i class="h ne" data-h="ne"></i><i class="h sw" data-h="sw"></i><i class="h se" data-h="se"></i></div><div class="mvx-meta" id="mvxMeta">16:9 · PREVIEW</div></div></div><div class="mvx-transport"><button class="mvx-play" id="mvxPlay">▶</button><span class="mvx-time" id="mvxTime">0:00.0 / 0:10.0</span><input class="mvx-scrub" id="mvxScrub" type="range" min="0" max="1000" value="0"></div></main>
 <aside class="mvx-side mvx-right" id="mvxRight"><div class="head"><b>Inspector</b><small>Thuộc tính clip đang chọn</small></div><div class="mvx-ins"><div class="mvx-empty" id="mvxInsEmpty">Chọn clip trên timeline hoặc bấm trực tiếp lên preview.</div><div id="mvxIns" class="hide"><div class="mvx-group"><div class="mvx-gtitle">Clip</div><div id="mvxInsName" style="font-size:.74rem;color:#e4ebf4;margin-bottom:8px"></div><div class="mvx-grid2"><label class="mvx-field"><span>Bắt đầu</span><input type="number" id="mvxStart" step="0.1" min="0"></label><label class="mvx-field"><span>Thời lượng</span><input type="number" id="mvxDur" step="0.1" min="0.1"></label></div></div><div class="mvx-group" id="mvxTransformGroup"><div class="mvx-gtitle">Transform</div><label class="mvx-field"><span>Scale / Zoom</span><div class="mvx-range"><input type="range" id="mvxScale" min="15" max="600" value="100"><output id="mvxScaleOut">100%</output></div></label><div class="mvx-grid2"><label class="mvx-field"><span>Vị trí X</span><div class="mvx-range"><input type="range" id="mvxPosX" min="-100" max="100" value="0"><output id="mvxPosXOut">0%</output></div></label><label class="mvx-field"><span>Vị trí Y</span><div class="mvx-range"><input type="range" id="mvxPosY" min="-100" max="100" value="0"><output id="mvxPosYOut">0%</output></div></label></div><div class="mvx-row"><button class="mvx-btn" id="mvxIFit">Fit</button><button class="mvx-btn" id="mvxIFill">Fill</button><button class="mvx-btn" id="mvxIReset">Reset</button></div></div><div class="mvx-group" id="mvxKeyframeGroup"><div class="mvx-gtitle">◆ Keyframe · Transform</div><div class="mvx-kf-toolbar"><button class="mvx-btn" id="mvxKfPrev" type="button">◀</button><button class="mvx-btn primary" id="mvxKfAdd" type="button">◆ Thêm keyframe</button><button class="mvx-btn" id="mvxKfNext" type="button">▶</button><button class="mvx-btn danger" id="mvxKfDel" type="button">Xóa</button></div><label class="mvx-field"><span>Chuyển động giữa keyframe</span><select id="mvxKfEase"><option value="smooth" selected>Mượt · Ease in/out</option><option value="linear">Đều · Linear</option><option value="easein">Tăng tốc · Ease in</option><option value="easeout">Giảm tốc · Ease out</option></select></label><div class="mvx-kf-status" id="mvxKfStatus">Chưa có keyframe. Đưa playhead đến vị trí cần thay đổi rồi bấm ◆ Thêm keyframe.</div></div><div class="mvx-group hide" id="mvxMotionGroup"><div class="mvx-gtitle">Motion Preset · kiểu ProShow</div><div class="mvx-preset-grid" id="mvxMotionGrid"><button class="mvx-preset" data-motion="zoomin"><b>＋ Zoom In</b><small>Từ xa lại gần</small></button><button class="mvx-preset" data-motion="zoomout"><b>－ Zoom Out</b><small>Từ gần ra xa</small></button><button class="mvx-preset" data-motion="panleft"><b>← Pan Left</b><small>Quét sang trái</small></button><button class="mvx-preset" data-motion="panright"><b>→ Pan Right</b><small>Quét sang phải</small></button><button class="mvx-preset" data-motion="floatup"><b>↑ Float Up</b><small>Nổi nhẹ đi lên</small></button><button class="mvx-preset" data-motion="drift"><b>✦ Drift</b><small>Pan + zoom mềm</small></button></div><div class="mvx-row"><button class="mvx-btn primary" id="mvxMotionRandom" type="button">🎞 Random motion</button><button class="mvx-btn" id="mvxMotionAll" type="button">🖼 Áp cho mọi ảnh</button></div><div class="mvx-note">Tự tạo 2 keyframe đầu/cuối clip để ảnh chạy như slideshow ProShow Gold.</div></div><div class="mvx-group hide" id="mvxLayerGroup"><div class="mvx-gtitle">Lớp timeline</div><div class="mvx-row"><button class="mvx-btn" id="mvxLayerUp" type="button">⬆ Lên lớp</button><button class="mvx-btn" id="mvxLayerDown" type="button">⬇ Xuống lớp</button></div><div class="mvx-note">Dùng để đưa clip đang chọn lên trên hoặc xuống dưới trong cùng timeline.</div></div><div class="mvx-group hide" id="mvxAdjustGroup"><div class="mvx-gtitle">Adjust · hình ảnh</div><label class="mvx-field"><span>Brightness</span><div class="mvx-range"><input type="range" id="mvxBrightness" min="40" max="180" value="100"><output id="mvxBrightnessOut">100%</output></div></label><label class="mvx-field"><span>Contrast</span><div class="mvx-range"><input type="range" id="mvxContrast" min="40" max="180" value="100"><output id="mvxContrastOut">100%</output></div></label><label class="mvx-field"><span>Saturation</span><div class="mvx-range"><input type="range" id="mvxSaturation" min="0" max="220" value="100"><output id="mvxSaturationOut">100%</output></div></label><label class="mvx-field"><span>Opacity</span><div class="mvx-range"><input type="range" id="mvxOpacity" min="0" max="100" value="100"><output id="mvxOpacityOut">100%</output></div></label><label class="mvx-field"><span>Blur</span><div class="mvx-range"><input type="range" id="mvxBlur" min="0" max="12" step="0.5" value="0"><output id="mvxBlurOut">0px</output></div></label><button class="mvx-btn" id="mvxResetAdjust" style="width:100%">↺ Reset Adjust</button></div><div class="mvx-group hide" id="mvxTextGroup"><div class="mvx-gtitle">Văn bản</div><label class="mvx-field"><span>Nội dung</span><textarea id="mvxText"></textarea></label><div class="mvx-grid2"><label class="mvx-field"><span>Font</span><select id="mvxFont"><option>Be Vietnam Pro</option><option>Arial</option><option>Arial Black</option><option>Helvetica</option><option>Georgia</option><option>Times New Roman</option><option>Verdana</option><option>Tahoma</option><option>Impact</option><option>Courier New</option></select></label><label class="mvx-field"><span>Màu</span><input type="color" id="mvxColor" value="#ffffff"></label></div><label class="mvx-field"><span>Cỡ chữ</span><div class="mvx-range"><input type="range" id="mvxTextSize" min="20" max="180" value="58"><output id="mvxTextSizeOut">58</output></div></label><div class="mvx-grid2"><label class="mvx-field"><span>Hiệu ứng chữ</span><select id="mvxTextFx"><option value="none">Không</option><option value="fade" selected>Fade mềm</option><option value="pop">Pop / Zoom</option><option value="slide">Trượt lên</option><option value="typewriter">Typewriter</option><option value="glow">Glow</option><option value="neon">Neon</option></select></label><label class="mvx-field"><span>Căn chữ</span><select id="mvxTextAlign"><option value="left">Trái</option><option value="center" selected>Giữa</option><option value="right">Phải</option></select></label></div><div class="mvx-grid2"><label class="mvx-field"><span>Viền chữ</span><div class="mvx-range"><input type="range" id="mvxStroke" min="0" max="12" step="1" value="0"><output id="mvxStrokeOut">0px</output></div></label><label class="mvx-field"><span>Màu viền</span><input type="color" id="mvxStrokeColor" value="#000000"></label></div><div class="mvx-sub">Chạy chữ bằng keyframe</div><div class="mvx-row"><select id="mvxTextMotion"><option value="rtl">Phải → trái</option><option value="ltr">Trái → phải</option><option value="btt">Dưới → lên</option><option value="ttb">Trên → xuống</option></select><button class="mvx-btn primary" id="mvxApplyTextMotion" type="button">▶ Tạo chạy chữ</button></div><div class="mvx-note">Tự tạo 2 keyframe đầu/cuối clip. Có thể bấm từng dấu ◆ để chỉnh lại vị trí.</div><div class="mvx-style"><button id="mvxBold">B</button><button id="mvxItalic"><i>I</i></button><button id="mvxShadow">✦</button></div></div><div class="mvx-group hide" id="mvxAudioGroup"><div class="mvx-gtitle">Âm lượng</div><div class="mvx-range"><input type="range" id="mvxVol" min="0" max="100" value="100"><output id="mvxVolOut">100%</output></div></div><button class="mvx-btn danger" id="mvxIDelete" style="width:100%">🗑 Xóa clip</button></div></div></aside>
 </div>
@@ -3806,14 +3806,17 @@ async function cloneExportProject(){
   document.body.appendChild(host);
   const snap={
     S:{ratio:S.ratio,quality:S.quality,fps:S.fps,t:0,duration:S.duration,selected:null,selectedKf:null,playing:false,exporting:true,fx:JSON.parse(JSON.stringify(S.fx||{}))},
-    L:{visual:[],overlay:[],text:[],audio:[]},host
+    L:{visual:[],overlay:[],text:[],audio:[]},host,objectUrls:[]
   };
   for(const c of L.visual){
     let n=plainExportClip(c);
     if(c.mediaType==='video'){
-      let v=document.createElement('video');v.preload='auto';v.muted=true;v.playsInline=true;
-      if(/^https?:/i.test(String(c.src||'')))v.crossOrigin='anonymous';
-      v.src=c.src;host.appendChild(v);try{v.load()}catch(e){};await waitMeta(v);n.el=v;
+      let v=document.createElement('video');v.preload='auto';v.muted=true;v.playsInline=true;let src=c.src;
+      if(/^https?:/i.test(String(src||'')) && window.StudioVault?.fetchBlob){
+        try{const b=await window.StudioVault.fetchBlob(src,false);if(b&&b.size){src=URL.createObjectURL(b);snap.objectUrls.push(src)}}catch(e){}
+      }
+      if(/^https?:/i.test(String(src||'')))v.crossOrigin='anonymous';
+      v.src=src;host.appendChild(v);try{v.load()}catch(e){};await waitMeta(v);if(!v.videoWidth||!v.videoHeight)throw new Error('Không giải mã được hình video nguồn: '+(c.name||'Video'));n.el=v;
     }else n.el=c.el;
     snap.L.visual.push(n);
   }
@@ -3929,6 +3932,58 @@ function recorderCandidates(){
   ];
   return all.filter(x=>{try{return MediaRecorder.isTypeSupported(x)}catch(e){return false}});
 }
+
+let _trietFfmpegRemuxerPromise=null;
+async function trietToBlobURL(url,mime){
+  const r=await fetch(url,{cache:'force-cache'});
+  if(!r.ok)throw new Error('Không tải được bộ chuẩn hóa MP4: HTTP '+r.status);
+  return URL.createObjectURL(new Blob([await r.blob()],{type:mime}));
+}
+async function loadTrietFfmpegRemuxer(note){
+  if(_trietFfmpegRemuxerPromise)return _trietFfmpegRemuxerPromise;
+  _trietFfmpegRemuxerPromise=(async()=>{
+    const baseFF='https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd';
+    const baseCore='https://unpkg.com/@ffmpeg/core@0.12.3/dist/umd';
+    if(note){note.className='mvx-note run';note.textContent='Đang tải bộ chuẩn hóa MP4 lần đầu (~31 MB)…';}
+    const jsResp=await fetch(baseFF+'/ffmpeg.js',{cache:'force-cache'});
+    if(!jsResp.ok)throw new Error('Không tải được FFmpeg wrapper: HTTP '+jsResp.status);
+    let js=await jsResp.text();
+    js=js.replace('new URL(e.p+e.u(814),e.b)','r.workerLoadURL');
+    const jsURL=URL.createObjectURL(new Blob([js],{type:'text/javascript'}));
+    await import(jsURL);
+    URL.revokeObjectURL(jsURL);
+    if(!window.FFmpegWASM||!window.FFmpegWASM.FFmpeg)throw new Error('FFmpeg WASM chưa khởi tạo được.');
+    const ff=new window.FFmpegWASM.FFmpeg();
+    await ff.load({
+      workerLoadURL:await trietToBlobURL(baseFF+'/814.ffmpeg.js','text/javascript'),
+      coreURL:await trietToBlobURL(baseCore+'/ffmpeg-core.js','text/javascript'),
+      wasmURL:await trietToBlobURL(baseCore+'/ffmpeg-core.wasm','application/wasm')
+    });
+    return ff;
+  })().catch(e=>{_trietFfmpegRemuxerPromise=null;throw e});
+  return _trietFfmpegRemuxerPromise;
+}
+async function normalizeMp4ForCompatibility(blob,note){
+  const ff=await loadTrietFfmpegRemuxer(note);
+  const stamp=Date.now(),input='triet_in_'+stamp+'.mp4',output='triet_out_'+stamp+'.mp4';
+  try{
+    if(note){note.className='mvx-note run';note.textContent='Đang chuẩn hóa MP4 để xem được trên Windows/điện thoại…';}
+    await ff.writeFile(input,new Uint8Array(await blob.arrayBuffer()));
+    const code=await ff.exec([
+      '-fflags','+genpts','-i',input,
+      '-map','0:v:0','-map','0:a:0?',
+      '-c','copy','-avoid_negative_ts','make_zero',
+      '-movflags','+faststart','-y',output
+    ]);
+    if(code!==0)throw new Error('FFmpeg remux trả mã '+code);
+    const data=await ff.readFile(output);
+    if(!data||!data.length)throw new Error('MP4 chuẩn hóa bị rỗng.');
+    return new Blob([data.buffer],{type:'video/mp4'});
+  }finally{
+    try{await ff.deleteFile(input)}catch(e){}
+    try{await ff.deleteFile(output)}catch(e){}
+  }
+}
 function makeRecorder(stream,quality,fps){
   const cand=recorderCandidates();
   if(!cand.length) throw new Error('Trình duyệt này chưa hỗ trợ MediaRecorder MP4/H.264. Hãy dùng Chrome hoặc Edge bản mới trên Windows/Android. Ứng dụng sẽ KHÔNG xuất WebM thay thế.');
@@ -3942,89 +3997,85 @@ function makeRecorder(stream,quality,fps){
   throw last||new Error('Không khởi tạo được bộ ghi MP4/H.264 + AAC trên thiết bị này.');
 }
 
+let _mvMp4MuxerPromise=null;
+function mvSleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function mvWaitEvent(el,name,ms=1200){return new Promise(resolve=>{let done=false,timer=null;const finish=()=>{if(done)return;done=true;clearTimeout(timer);try{el.removeEventListener(name,finish)}catch(e){}resolve()};try{el.addEventListener(name,finish,{once:true})}catch(e){resolve();return}timer=setTimeout(finish,ms)})}
+function mvWaitVideoFrame(v,ms=240){return new Promise(resolve=>{let done=false,timer=null;const finish=()=>{if(done)return;done=true;clearTimeout(timer);resolve()};if(v&&typeof v.requestVideoFrameCallback==='function'){try{v.requestVideoFrameCallback(finish)}catch(e){requestAnimationFrame(()=>requestAnimationFrame(finish))}}else requestAnimationFrame(()=>requestAnimationFrame(finish));timer=setTimeout(finish,ms)})}
+function loadMvMp4Muxer(){
+  if(window.Mp4Muxer)return Promise.resolve(window.Mp4Muxer);
+  if(_mvMp4MuxerPromise)return _mvMp4MuxerPromise;
+  _mvMp4MuxerPromise=new Promise((resolve,reject)=>{
+    const urls=['https://unpkg.com/mp4-muxer@5.2.1/build/mp4-muxer.js','https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.1/build/mp4-muxer.js'];let i=0;
+    const next=()=>{if(window.Mp4Muxer){resolve(window.Mp4Muxer);return}if(i>=urls.length){reject(new Error('Không tải được bộ đóng gói MP4. Kiểm tra Internet/CDN rồi thử lại.'));return}const s=document.createElement('script');s.src=urls[i++];s.async=false;s.onload=()=>window.Mp4Muxer?resolve(window.Mp4Muxer):next();s.onerror=()=>{try{s.remove()}catch(e){}next()};document.head.appendChild(s)};next();
+  }).catch(e=>{_mvMp4MuxerPromise=null;throw e});
+  return _mvMp4MuxerPromise;
+}
+async function chooseMvH264Config(w,h,fps,bitrate){
+  const max=Math.max(w,h),codes=max<=1280?['avc1.42E01F','avc1.42001F','avc1.4D401F','avc1.64001F']:max<=1920?['avc1.42E028','avc1.4D4028','avc1.640028','avc1.64002A']:['avc1.640032','avc1.4D4032','avc1.640033'];
+  for(const hw of ['no-preference','prefer-hardware','prefer-software'])for(const codec of codes){
+    const cfg={codec,width:w,height:h,bitrate,bitrateMode:'variable',framerate:fps,hardwareAcceleration:hw,avc:{format:'avc'}};
+    try{const r=await VideoEncoder.isConfigSupported(cfg);if(r&&r.supported)return{encoderConfig:r.config||cfg,muxerCodec:'avc',label:'H.264/AVC'}}catch(e){}
+  }
+  throw new Error('Chrome/Edge trên máy này chưa mã hóa được H.264 ở độ phân giải đã chọn. Hãy thử Full HD hoặc HD · 30 FPS.');
+}
+async function chooseMvAacConfig(sampleRate=48000,channels=2,bitrate=192000){
+  const cfg={codec:'mp4a.40.2',sampleRate,numberOfChannels:channels,bitrate};
+  try{const r=await AudioEncoder.isConfigSupported(cfg);if(r&&r.supported)return{encoderConfig:r.config||cfg,muxerCodec:'aac',label:'AAC'}}catch(e){}
+  throw new Error('Chrome/Edge trên máy này chưa hỗ trợ AudioEncoder AAC. Hãy cập nhật trình duyệt lên bản mới.');
+}
+async function mvSeekExact(v,target,strict=false){
+  if(!v)return;
+  if(v.readyState<2){try{v.load()}catch(e){};await Promise.race([mvWaitEvent(v,'loadeddata',1800),mvWaitEvent(v,'canplay',1800)])}
+  target=Math.max(0,Number(target)||0);let max=(isFinite(v.duration)&&v.duration>0)?Math.max(0,v.duration-.025):target;target=Math.min(target,max);
+  if(Math.abs((Number(v.currentTime)||0)-target)>.0025){let p=mvWaitEvent(v,'seeked',1000);try{v.currentTime=target}catch(e){}await p}
+  if(strict)await mvWaitVideoFrame(v,220);
+}
+function mvVisualPairAt(snap,t){
+  const a=snap.L.visual.slice().sort((x,y)=>x.start-y.start),cur=a.filter(c=>t>=c.start-1e-6&&t<c.start+c.duration-1e-6).pop()||null;if(!cur)return[];
+  const out=[cur],i=a.indexOf(cur),pr=i>0?a[i-1]:null,d=Math.max(0,Number(snap.S.fx.transitionDur)||0),local=t-cur.start;
+  if(pr&&snap.S.fx.transition!=='none'&&d>0&&local>=0&&local<d&&Math.abs((pr.start+pr.duration)-cur.start)<.12)out.unshift(pr);
+  return out;
+}
+async function prepareMvFrameVideos(snap,t,state){
+  const need=mvVisualPairAt(snap,t);for(const c of need){if(c.mediaType!=='video'||!c.el)continue;const isCurrent=t>=c.start-1e-6&&t<c.start+c.duration-1e-6;let local=isCurrent?(t-c.start):Math.max(0,c.duration-.001);let target=(c.sourceIn||0)+local;let changed=state.lastId!==c.id;await mvSeekExact(c.el,target,changed);state.lastId=c.id}
+}
+async function mvFetchBlob(url){
+  if(window.StudioVault?.fetchBlob){try{const b=await window.StudioVault.fetchBlob(url,true);if(b&&b.size)return b}catch(e){}}
+  const r=await fetch(url);if(!r.ok)throw new Error('HTTP '+r.status);const b=await r.blob();if(!b||!b.size)throw new Error('File audio rỗng');return b;
+}
+async function renderMvOfflineAudio(snap,total,note){
+  const SR=48000,CH=2,frames=Math.max(1,Math.ceil(total*SR)),offline=new OfflineAudioContext(CH,frames,SR),cache=new Map(),jobs=snap.L.audio.filter(c=>c&&c.src&&c.duration>0);let decoded=0,scheduled=0,failed=0;
+  const decode=async url=>{if(cache.has(url))return cache.get(url);const p=mvFetchBlob(url).then(b=>b.arrayBuffer()).then(ab=>new Promise((resolve,reject)=>{try{const x=offline.decodeAudioData(ab.slice(0));if(x&&x.then)x.then(resolve,reject);else offline.decodeAudioData(ab.slice(0),resolve,reject)}catch(e){reject(e)}}));cache.set(url,p);return p};
+  for(let i=0;i<jobs.length;i++){const c=jobs[i];try{if(note)note.textContent='🔊 Mix audio '+(i+1)+'/'+jobs.length+' · '+c.name;const buf=await decode(c.src);decoded++;let off=Math.max(0,Number(c.sourceIn)||0);if(off>=buf.duration-.005)continue;let dur=Math.min(Math.max(.001,Number(c.duration)||.001),Math.max(.001,buf.duration-off),Math.max(.001,total-Math.max(0,c.start)));const src=offline.createBufferSource(),g=offline.createGain();src.buffer=buf;src.connect(g);g.connect(offline.destination);let when=Math.max(0,Number(c.start)||0),vol=clamp(Number(c.volume??1),0,2),end=Math.min(total,when+dur),fade=Math.min(.012,Math.max(.002,(end-when)*.2));g.gain.setValueAtTime(0,when);g.gain.linearRampToValueAtTime(vol,Math.min(end,when+fade));g.gain.setValueAtTime(vol,Math.max(when+fade,end-fade));g.gain.linearRampToValueAtTime(0,end);src.start(when,off,dur);scheduled++}catch(e){failed++;console.warn('[MV audio decode failed]',c?.name,c?.src,e)}}
+  if(jobs.length&&scheduled===0)throw new Error('Không giải mã được nguồn âm thanh trên timeline. Video chưa xuất để tránh tạo MP4 bị mất tiếng.');
+  if(note)note.textContent='🔊 Đang render audio hoàn chỉnh…';const buffer=await offline.startRendering();return{buffer,stats:{jobs:jobs.length,decoded,scheduled,failed}};
+}
+async function encodeMvAudio(buffer,muxer,choice){
+  let encoderError=null;const enc=new AudioEncoder({output:(chunk,meta)=>muxer.addAudioChunk(chunk,meta),error:e=>{encoderError=e;console.error('[MV AudioEncoder]',e)}});enc.configure(choice.encoderConfig);const sr=buffer.sampleRate,ch=Math.min(2,buffer.numberOfChannels||1),block=4096,total=buffer.length;
+  for(let off=0;off<total;off+=block){const len=Math.min(block,total-off),data=new Float32Array(len*ch);for(let c=0;c<ch;c++){const src=buffer.getChannelData(Math.min(c,buffer.numberOfChannels-1)).subarray(off,off+len);data.set(src,c*len)}const ad=new AudioData({format:'f32-planar',sampleRate:sr,numberOfFrames:len,numberOfChannels:ch,timestamp:Math.round(off/sr*1000000),data});enc.encode(ad);ad.close();if(enc.encodeQueueSize>10)await mvSleep(3)}
+  await enc.flush();enc.close();if(encoderError)throw encoderError;
+}
 async function exportVideo(){
   if(!L.visual.length){toast('Cần ảnh/video để xuất','err');return}
-  let btn=q('#mvxExport'),note=q('#mvxExportNote'),dl=q('#mvxDownloadLast'),snap=null,pack=null,renderCanvas=null,stream=null,vtrack=null;
-  btn.disabled=true;if(dl)dl.classList.add('hide');note.className='mvx-note run';note.textContent='Đang chuẩn bị renderer riêng… Preview vẫn dùng bình thường.';
+  const btn=q('#mvxExport'),note=q('#mvxExportNote'),dl=q('#mvxDownloadLast');let snap=null,renderCanvas=null,videoEncoder=null;
+  btn.disabled=true;if(dl)dl.classList.add('hide');note.className='mvx-note run';note.textContent='Đang chuẩn bị MP4 frame-by-frame theo TRIET-STUDIO…';
   try{
-    snap=await cloneExportProject();
-    let d=dims(Q[snap.S.quality].s,snap.S.ratio);
-    renderCanvas=document.createElement('canvas');renderCanvas.width=d.w;renderCanvas.height=d.h;
-    // Không display:none: Chrome có thể ngừng phát frame từ canvas ẩn hoàn toàn.
-    renderCanvas.style.cssText='position:fixed;left:-10000px;top:0;width:4px;height:4px;opacity:.01;pointer-events:none;z-index:-1';
-    document.body.appendChild(renderCanvas);
-    const renderer=makeDetachedRenderer(snap,renderCanvas);
-    renderer.drawAt(0);
-
-    pack=await buildDetachedExportAudio(snap.L.audio,snap.host);
-
-    // Ưu tiên captureStream(0) + requestFrame: mỗi frame render được đẩy chủ động, ổn định hơn canvas ẩn tự capture.
-    try{stream=renderCanvas.captureStream(0)}catch(e){stream=renderCanvas.captureStream(snap.S.fps)}
-    vtrack=stream.getVideoTracks()[0];
-    if(!vtrack)throw new Error('Không tạo được video track từ canvas.');
-    const manual=typeof vtrack.requestFrame==='function';
-    if(!manual){try{stream.getTracks().forEach(t=>t.stop())}catch(e){};stream=renderCanvas.captureStream(snap.S.fps);vtrack=stream.getVideoTracks()[0]}
-    let atracks=pack?.count?pack.stream.getAudioTracks():[];
-    const mixed=new MediaStream([vtrack,...atracks]);
-    const made=makeRecorder(mixed,snap.S.quality,snap.S.fps),rec=made.rec,mimeUsed=made.mime,chunks=[];
-    rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
-    let done=new Promise((resolve,reject)=>{rec.onstop=resolve;rec.onerror=e=>reject(e.error||new Error('MediaRecorder lỗi'))});
-    rec.start(250);
-    if(manual)try{vtrack.requestFrame()}catch(e){}
-    let delay=pack?.count?.10:0;if(pack?.count)pack.start(delay);if(delay)await new Promise(r=>setTimeout(r,delay*1000));
-
-    let startClock=performance.now(),duration=Math.max(.1,snap.S.duration),lastPct=-1;
-    await new Promise((resolve,reject)=>{
-      let watchdog=setTimeout(()=>reject(new Error('Render quá thời gian cho phép.')),Math.max(30000,(duration+25)*1000));
-      const loop=()=>{
-        if(rec.state==='inactive'){clearTimeout(watchdog);return reject(new Error('MediaRecorder đã dừng trước khi render xong.'))}
-        let rt=Math.min(duration,(performance.now()-startClock)/1000);
-        syncDetachedVideos(snap,rt,true);renderer.drawAt(rt);
-        if(manual)try{vtrack.requestFrame()}catch(e){}
-        let pct=Math.min(100,Math.round(rt/duration*100));if(pct!==lastPct){lastPct=pct;note.textContent='Đang render… '+pct+'% · Bạn vẫn có thể thao tác trên giao diện';}
-        if(rt>=duration-.01){clearTimeout(watchdog);return resolve()}
-        setTimeout(loop,Math.max(8,Math.round(1000/Math.max(24,snap.S.fps))))
-      };
-      loop();
-    });
-
-    snap.L.visual.forEach(c=>{if(c.mediaType==='video'&&c.el)try{c.el.pause()}catch(e){}});
-    try{if(rec.state==='recording')rec.requestData()}catch(e){}
-    await new Promise(r=>setTimeout(r,120));
-    rec.stop();await done;
-    if(pack){pack.stop();pack=null}
-    try{stream.getTracks().forEach(t=>t.stop())}catch(e){}
-
-    const actualType=(chunks[0]&&chunks[0].type)||mimeUsed||'video/mp4';
-    if(!/mp4/i.test(actualType) && !/mp4/i.test(mimeUsed||'')){
-      throw new Error('Trình duyệt trả về định dạng không phải MP4 ('+actualType+'). Đã hủy file để tránh xuất WebM ngoài ý muốn.');
+    if(!window.VideoEncoder||!window.VideoFrame||!window.AudioEncoder||!window.AudioData)throw new Error('Xuất MP4 frame-by-frame cần WebCodecs. Hãy dùng Chrome/Edge mới trên HTTPS.');
+    snap=await cloneExportProject();const d=dims(Q[snap.S.quality].s,snap.S.ratio),fps=Math.max(1,Number(snap.S.fps)||30),total=Math.max(.001,snap.S.duration),frames=Math.max(1,Math.ceil(total*fps));let w=d.w,h=d.h;if(w%2)w--;if(h%2)h--;
+    renderCanvas=document.createElement('canvas');renderCanvas.width=w;renderCanvas.height=h;renderCanvas.style.cssText='position:fixed;left:-10000px;top:0;width:4px;height:4px;opacity:.01;pointer-events:none;z-index:-1';document.body.appendChild(renderCanvas);const renderer=makeDetachedRenderer(snap,renderCanvas);
+    const Mp4=await loadMvMp4Muxer();note.textContent='Đang kiểm tra H.264 + AAC…';const videoChoice=await chooseMvH264Config(w,h,fps,Math.round(Q[snap.S.quality].b*(fps===60?1.35:1))),audioChoice=await chooseMvAacConfig(48000,2,192000);
+    const target=new Mp4.ArrayBufferTarget(),muxer=new Mp4.Muxer({target,video:{codec:videoChoice.muxerCodec,width:w,height:h,frameRate:fps},audio:{codec:audioChoice.muxerCodec,numberOfChannels:2,sampleRate:48000},fastStart:'in-memory',firstTimestampBehavior:'offset'});
+    let videoError=null;videoEncoder=new VideoEncoder({output:(chunk,meta)=>muxer.addVideoChunk(chunk,meta),error:e=>{videoError=e;console.error('[MV VideoEncoder]',e)}});videoEncoder.configure(videoChoice.encoderConfig);
+    const audioPromise=renderMvOfflineAudio(snap,total,note);const seekState={lastId:null};
+    for(let i=0;i<frames;i++){
+      const t=Math.min(total-.000001,i/fps);await prepareMvFrameVideos(snap,t,seekState);renderer.drawAt(t);const vf=new VideoFrame(renderCanvas,{timestamp:Math.round(i/fps*1000000),duration:Math.round(1000000/fps),alpha:'discard'});videoEncoder.encode(vf,{keyFrame:i===0||i%(fps*2)===0});vf.close();if(videoEncoder.encodeQueueSize>18)await mvSleep(1);if(i%8===0||i===frames-1){const pct=Math.round((i+1)/frames*78);note.textContent='🎞 '+videoChoice.label+' · Frame '+(i+1)+'/'+frames+' · '+pct+'%';}
     }
-    const mp4Type=/mp4/i.test(actualType)?actualType:(mimeUsed||'video/mp4');
-    let blob=new Blob(chunks,{type:mp4Type});
-    if(blob.size<1024)throw new Error('File MP4 render quá nhỏ/rỗng ('+blob.size+' bytes).');
-    const ext='.mp4';
-    let main=snap.L.audio.find(x=>x.role==='main'),safe=(main?.name||'TRIET_MV').replace(/[^\p{L}\p{N}_-]+/gu,'_'),dt=new Date(),stamp=dt.getFullYear()+String(dt.getMonth()+1).padStart(2,'0')+String(dt.getDate()).padStart(2,'0')+'_'+String(dt.getHours()).padStart(2,'0')+String(dt.getMinutes()).padStart(2,'0'),fn='MV_'+safe+'_'+Q[snap.S.quality].l+'_'+snap.S.ratio.replace('x','-')+'_'+snap.S.fps+'fps_'+stamp+ext;
-    const url=keepLastRenderedDownload(blob,fn);
-    const autoOk=autoDownloadRendered(url,fn);
-
-    let cloud='';
-    if(window.StudioVault?.saveBlob)try{
-      await window.StudioVault.saveBlob({id:'mv-'+Date.now()+'-'+uid(),kind:'mv',title:fn.replace(/\.[^.]+$/,''),filename:fn,duration:snap.S.duration,quality:Q[snap.S.quality].l,ratio:snap.S.ratio.replace('x',':'),fps:snap.S.fps,resolution:d.w+' × '+d.h,at:Date.now()},blob,null,p=>note.textContent='Render xong · đang lưu Firebase '+p+'%');
-      cloud=' · đã lưu Firebase';
-    }catch(e){cloud=' · Firebase chưa lưu: '+e.message}
-    note.innerHTML='✓ Render thành công <b>'+esc(fn)+'</b> · '+Math.round(blob.size/1048576*10)/10+' MB · '+(atracks.length?'có âm thanh':'không có audio')+cloud+(autoOk?' · đã yêu cầu tải tự động.':'')+'<br>Nếu trình duyệt không tự tải, bấm nút <b>Tải video vừa render</b> phía trên.';
-    note.className='mvx-note ok';
-  }catch(e){
-    if(pack)try{pack.stop()}catch(_){};
-    if(stream)try{stream.getTracks().forEach(t=>t.stop())}catch(_){};
-    note.textContent='Xuất video lỗi: '+(e.message||e);note.className='mvx-note err';
-  }finally{
-    btn.disabled=false;
-    if(snap?.L?.visual)snap.L.visual.forEach(c=>{if(c.mediaType==='video'&&c.el)try{c.el.pause()}catch(e){}});
-    if(snap?.host)try{snap.host.remove()}catch(e){}
-    if(renderCanvas)try{renderCanvas.remove()}catch(e){}
-    // Không thay đổi S.t, không pause preview, không reset canvas giao diện.
-  }
+    note.textContent='Đang hoàn tất H.264…';await videoEncoder.flush();videoEncoder.close();videoEncoder=null;if(videoError)throw videoError;
+    const audio=await audioPromise;note.textContent='🔊 Đang mã hóa AAC · '+audio.stats.scheduled+'/'+audio.stats.jobs+' nguồn…';await encodeMvAudio(audio.buffer,muxer,audioChoice);note.textContent='📦 Đang đóng gói MP4 Fast Start…';muxer.finalize();let blob=new Blob([target.buffer],{type:'video/mp4'});if(blob.size<1024)throw new Error('MP4 xuất ra bị rỗng/quá nhỏ.');
+    const main=snap.L.audio.find(x=>x.role==='main'),safe=(main?.name||'TRIET_MV').replace(/[^\p{L}\p{N}_-]+/gu,'_'),dt=new Date(),stamp=dt.getFullYear()+String(dt.getMonth()+1).padStart(2,'0')+String(dt.getDate()).padStart(2,'0')+'_'+String(dt.getHours()).padStart(2,'0')+String(dt.getMinutes()).padStart(2,'0'),fn='MV_'+safe+'_'+Q[snap.S.quality].l+'_'+snap.S.ratio.replace('x','-')+'_'+fps+'fps_'+stamp+'.mp4';
+    const url=keepLastRenderedDownload(blob,fn),autoOk=autoDownloadRendered(url,fn);let cloud='';if(window.StudioVault?.saveBlob)try{await window.StudioVault.saveBlob({id:'mv-'+Date.now()+'-'+uid(),kind:'mv',title:fn.replace(/\.[^.]+$/,''),filename:fn,duration:snap.S.duration,quality:Q[snap.S.quality].l,ratio:snap.S.ratio.replace('x',':'),fps,resolution:w+' × '+h,at:Date.now()},blob,null,p=>note.textContent='MP4 xong · đang lưu Firebase '+p+'%');cloud=' · đã lưu Firebase'}catch(e){cloud=' · Firebase chưa lưu: '+e.message}
+    note.innerHTML='✓ MP4 FRAME-BY-FRAME thành công <b>'+esc(fn)+'</b> · '+(blob.size/1048576).toFixed(1)+' MB · H.264 + AAC'+(audio.stats.jobs?' · audio '+audio.stats.scheduled+'/'+audio.stats.jobs:' · track audio im lặng')+cloud+(autoOk?' · đã yêu cầu tải tự động.':'')+'<br>Nếu Chrome không tự tải, bấm <b>Tải video vừa render</b>.';note.className='mvx-note ok';
+  }catch(e){note.textContent='Xuất MP4 lỗi: '+(e.message||e);note.className='mvx-note err';console.error('[MV FRAME-BY-FRAME EXPORT]',e)}finally{if(videoEncoder)try{videoEncoder.close()}catch(e){};btn.disabled=false;if(snap?.L?.visual)snap.L.visual.forEach(c=>{if(c.mediaType==='video'&&c.el)try{c.el.pause()}catch(e){}});if(snap?.objectUrls)for(const u of snap.objectUrls)try{URL.revokeObjectURL(u)}catch(e){};if(snap?.host)try{snap.host.remove()}catch(e){};if(renderCanvas)try{renderCanvas.remove()}catch(e){};/* không thay đổi S.t / preview chính */}
 }
 function workspace(on){document.body.classList.toggle('mvx-workspace',!!on);q('#mvTab').classList.toggle('is-on',!!on);let b=q('#mvWorkspaceBtn');if(b)b.classList.toggle('on',!!on);if(on)requestAnimationFrame(()=>{previewDims();recalc();fitProject();inspector();draw()});else{pause();if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}}
 function bind(){q('#mvxPlay').onclick=play;q('#mvxScrub').oninput=e=>{pause();seekTo(Number(e.target.value)/1000*S.duration)};q('#mvxRuler').onpointerdown=rulerDown;Object.values(lanes).forEach(l=>l.onpointerdown=e=>{if(e.target===l){pause();seekTo(tlTime(e))}});q('#mvxSplit').onclick=split;q('#mvxCopy').onclick=copySelectedClip;q('#mvxPaste').onclick=pasteClipboard;q('#mvxPaste').disabled=true;q('#mvxDelete').onclick=()=>remove();q('#mvxIDelete').onclick=()=>remove();q('#mvxFitProject').onclick=fitProject;q('#mvxFitClip').onclick=fitClip;q('#mvxZoom').oninput=e=>zoomP(z2p(e.target.value),S.t);q('#mvxFit').onclick=()=>fit(false);q('#mvxFill').onclick=()=>fit(true);q('#mvxReset').onclick=reset;q('#mvxIFit').onclick=()=>fit(false);q('#mvxIFill').onclick=()=>fit(true);q('#mvxIReset').onclick=reset;q('#mvxBox').onpointerdown=boxDown;cv.onpointerdown=e=>{let c=hit(stagePoint(e));choose(c?c.id:null)};cv.addEventListener('wheel',e=>{let c=sel();if(!c||c.kind==='audio'||!active(c))return;e.preventDefault();tr(c).scale=clamp(tr(c).scale*(e.deltaY<0?1.06:.94),.15,6);insTransform();draw()},{passive:false});qa('#mvxRatios button').forEach(b=>b.onclick=()=>setRatio(b.dataset.r));q('#mvxQuality').onchange=e=>{S.quality=e.target.value;setRatio(S.ratio)};q('#mvxFps').onchange=e=>{S.fps=Number(e.target.value);state()};q('#mvxExport').onclick=exportVideo;qa('#mvxPresets .mvx-preset').forEach(b=>b.onclick=()=>applyPreset(b.dataset.preset));qa('#mvxFxGrid .mvx-fxbtn').forEach(b=>b.onclick=()=>{let k=b.dataset.fx;S.fx[k]=!S.fx[k];if(S.fx[k]&&Number(S.fx.intensity)<20)S.fx.intensity=60;S.fx.preset='custom';fxUi();state();draw();toast((S.fx[k]?'Bật ':'Tắt ')+b.textContent+' · '+S.fx.intensity+'%')});q('#mvxFxIntensity').oninput=e=>{S.fx.intensity=Number(e.target.value)||0;S.fx.preset='custom';fxUi();draw()};q('#mvxTransition').onchange=e=>{S.fx.transition=e.target.value;S.fx.preset='custom';fxUi();draw()};q('#mvxTransitionDur').onchange=e=>{S.fx.transitionDur=clamp(Number(e.target.value)||0,0,2);S.fx.preset='custom';fxUi();draw()};qa('#mvxSfxGrid .mvx-sfx').forEach(b=>{b.draggable=true;b.onclick=()=>insertSfx(b.dataset.sfx,b);b.ondragstart=()=>{dragPayload={kind:'sfx',sfx:b.dataset.sfx,label:b.textContent.trim()}};b.ondragend=()=>{dragPayload=null;qa('.mvx-lane').forEach(x=>x.classList.remove('drop'))}});qa('#mvxMotionGrid .mvx-preset').forEach(b=>b.onclick=()=>motionPreset(b.dataset.motion));q('#mvxMotionRandom').onclick=()=>motionPreset('random');q('#mvxMotionAll').onclick=motionAllImages;q('#mvxLayerUp').onclick=()=>moveClipOrder(-1);q('#mvxLayerDown').onclick=()=>moveClipOrder(1);Object.values(lanes).forEach(l=>{l.ondragover=e=>{if(!dragPayload)return;e.preventDefault();l.classList.add('drop')};l.ondragleave=()=>l.classList.remove('drop');l.ondrop=async e=>{if(!dragPayload)return;e.preventDefault();qa('.mvx-lane').forEach(x=>x.classList.remove('drop'));let t=tlTime(e);try{if(dragPayload.kind==='vault-image')await addImage(dragPayload.url,dragPayload.name,t);else if(dragPayload.kind==='vault-music')await addMusicItem(dragPayload.item);else if(dragPayload.kind==='sfx')await insertSfx(dragPayload.sfx,null,t);seekTo(t)}catch(err){toast(err.message||err,'err')}finally{dragPayload=null}}});
@@ -4123,5 +4174,15 @@ q('#mvxStart').onchange=timing;q('#mvxDur').onchange=timing;q('#mvxScale').oninp
   .cd-actions,.lyr-actions{grid-template-columns:1fr!important}.lyr-actions .cnt{grid-column:auto}
 }
 </style>
+
+<script id="mv-local-file-safe-note">
+(function(){
+  try{
+    if(location.protocol==='file:' && window.self!==window.top){
+      console.warn('[MV LOCAL SAFE] Ứng dụng đang chạy trong iframe file://. Chrome coi các file:// là unique security origins. Hãy mở file trực tiếp hoặc chạy qua http://localhost / HTTPS để tránh lỗi tải tài nguyên trong frame.');
+    }
+  }catch(e){}
+})();
+</script>
 </body>
 </html>
