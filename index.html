@@ -950,7 +950,7 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
 <!-- ============ RAIL ============ -->
 <aside class="rail">
   <div class="panel">
-    <div class="panel-hd"><b>Prompt gửi đi</b><span class="cnt" id="styleCnt">0 / 1000</span></div>
+    <div class="panel-hd"><b>Prompt gửi đi</b><span class="cnt" id="styleCnt">0 / 920 an toàn</span></div>
     <div class="panel-bd">
       <div class="rowsp"><b>Style</b><span style="display:flex;gap:6px"><button class="btn quiet sm" id="aiStyleBtn" title="AI đọc mọi khai báo và viết lại prompt Suno tối ưu, tôn trọng đúng cách thể hiện">✨ AI tối ưu</button><button class="btn quiet sm" data-copy="style">Sao chép</button></span></div>
       <div class="out empty" id="styleOut">Chưa chọn thiết lập nào.</div>
@@ -1566,8 +1566,8 @@ function voiceGender(){
 function hardGenderText(){
   if($('instrumental').checked || !($('strictVoice')&&$('strictVoice').checked) || S.duet!=='solo') return '';
   const g=voiceGender();
-  if(g==='m') return 'MALE VOCAL ONLY: one single adult male lead singer for the entire song, all lead and backing vocals performed by male voices only';
-  if(g==='f') return 'FEMALE VOCAL ONLY: one single adult female lead singer for the entire song, all lead and backing vocals performed by female voices only';
+  if(g==='m') return 'MALE VOCAL ONLY, adult male lead throughout, male backing vocals only';
+  if(g==='f') return 'FEMALE VOCAL ONLY, adult female lead throughout, female backing vocals only';
   return '';
 }
 
@@ -1575,7 +1575,7 @@ function voiceLockText(){
   if($('instrumental').checked || !($('strictVoice')&&$('strictVoice').checked)) return '';
   const r=VOICE_LOCK[S.voice];
   const g=hardGenderText();
-  const timbre=r ? 'VOICE TIMBRE LOCK: '+r.pos : '';
+  const timbre=r ? 'voice timbre: '+r.pos : '';
   return [g,timbre].filter(Boolean).join('; ');
 }
 function selectedInstrumentTags(){ return S.instr.map(l=>instrDesc(l)).filter(Boolean); }
@@ -1583,20 +1583,46 @@ function instrumentLockText(){
   if(!($('strictArrangement')&&$('strictArrangement').checked) || !S.instr.length) return '';
   const exact=selectedInstrumentTags();
   if(exact.length===1){
-    return 'INSTRUMENT HARD LOCK: ONLY melodic lead instrument is '+exact[0]+'; it must be clearly audible in intro, fills and interludes; all other melodic lead instruments are excluded';
+    return 'ONLY melodic lead: '+exact[0]+'; prominent in intro, fills and interludes; no other melodic leads';
   }
-  return 'INSTRUMENT HARD LOCK: ONLY selected melodic instruments may lead: '+exact.join(' + ')+'; all unselected melodic lead instruments are excluded';
+  return 'ONLY selected melodic leads: '+exact.join(' + ')+'; no unselected melodic leads';
 }
 function soloLockText(){
   const s=$('solo')&&$('solo').value; if(!s) return '';
   const bars=$('soloBars')?$('soloBars').value:'8';
   const mode=$('soloMode')?$('soloMode').value:'spotlight';
   const modeText={spotlight:'other instruments pull back',callresponse:'call-and-response with the vocal around the solo',emotional:'emotional sustained expressive phrases',virtuoso:'virtuosic climactic performance'}[mode]||'other instruments pull back';
-  return 'MANDATORY SOLO: '+bars+'-bar featured '+(TAG[s]||s)+' instrumental solo, '+modeText+', no vocals during the solo';
+  return 'MANDATORY '+bars+'-bar '+(TAG[s]||s)+' solo, '+modeText+', no vocals';
 }
 function criticalStyleLocks(){
   const a=[]; const v=voiceLockText(), i=instrumentLockText(), s=soloLockText();
   if(v)a.push(v); if(i)a.push(i); if(s)a.push(s); return a;
+}
+
+/* Suno/Kie V5.x: music style API tối đa 1000 ký tự. Giữ biên an toàn để tránh lỗi
+   sau khi ghép khóa giọng/nhạc cụ/solo. V4 có giới hạn thấp hơn. */
+const STYLE_SAFE_MAX_V5=920;
+const STYLE_SAFE_MAX_V4=190;
+function styleSafeMax(){ return $('model') && $('model').value==='V4' ? STYLE_SAFE_MAX_V4 : STYLE_SAFE_MAX_V5; }
+function compactStyleText(raw,maxLen=styleSafeMax()){
+  let text=String(raw||'').replace(/\s+/g,' ').replace(/\s*,\s*/g,', ').replace(/\s*;\s*/g,'; ').trim();
+  if(text.length<=maxLen) return text;
+  // Style được dựng theo thứ tự ưu tiên: khóa cứng đứng trước. Vì vậy giữ từ trái sang phải.
+  const parts=text.split(/\s*,\s*/).map(x=>x.trim()).filter(Boolean);
+  const out=[], seen=new Set();
+  for(const p0 of parts){
+    const p=p0.replace(/\s+/g,' ').trim();
+    const k=p.toLowerCase();
+    if(!p || seen.has(k)) continue;
+    const candidate=(out.length?out.join(', ')+', ':'')+p;
+    if(candidate.length<=maxLen){ out.push(p); seen.add(k); }
+  }
+  let result=out.join(', ');
+  // Trường hợp một cụm đầu tiên quá dài: cắt ở ranh giới từ, không vượt giới hạn.
+  if(!result && text){
+    result=text.slice(0,maxLen).replace(/\s+\S*$/,'').replace(/[;,\s]+$/,'');
+  }
+  return result;
 }
 const NEG_STYLE_MAX=180; // Kie/Suno giới hạn 200 ký tự; chừa biên an toàn.
 function splitNegPhrases(text){
@@ -1810,10 +1836,14 @@ function summary(){
 
 let AI_STYLE=null; /* prompt style do AI tối ưu; null = dùng buildStyle() tự động */
 function effectiveStyle(){
-  if(!(AI_STYLE && AI_STYLE.trim())) return buildStyle();
-  const clean=sanitizeAiStyleForLocks(AI_STYLE.trim());
-  const locks=criticalStyleLocks();
-  return locks.length ? locks.join(', ')+(clean?', '+clean:'') : clean;
+  let raw;
+  if(!(AI_STYLE && AI_STYLE.trim())) raw=buildStyle();
+  else{
+    const clean=sanitizeAiStyleForLocks(AI_STYLE.trim());
+    const locks=criticalStyleLocks();
+    raw=locks.length ? locks.join(', ')+(clean?', '+clean:'') : clean;
+  }
+  return compactStyleText(raw,styleSafeMax());
 }
 function clearAiStyle(){ if(AI_STYLE!==null){ AI_STYLE=null; const bar=$('aiStyleBar'); if(bar) bar.style.display='none'; } }
 function sync(fromUserChange){
@@ -1824,8 +1854,8 @@ function sync(fromUserChange){
   po.textContent=pr||'Chưa có lời bài hát.'; po.classList.toggle('empty',!pr);
 
   const isV4=$('model').value==='V4';
-  const styleMax=isV4?200:1000, promptMax=isV4?3000:5000;
-  const sc=$('styleCnt'); sc.textContent=st.length+' / '+styleMax; sc.classList.toggle('over',st.length>styleMax);
+  const styleMax=isV4?STYLE_SAFE_MAX_V4:STYLE_SAFE_MAX_V5, promptMax=isV4?3000:5000;
+  const sc=$('styleCnt'); sc.textContent=st.length+' / '+styleMax+' an toàn'; sc.classList.toggle('over',st.length>styleMax);
   const pc=$('promptCnt'); pc.textContent=pr.length+' / '+promptMax; pc.classList.toggle('over',pr.length>promptMax);
   $('lyrCnt').textContent=pr.length+' / '+promptMax;
 
@@ -2158,11 +2188,15 @@ function reuse(id){
 }
 
 async function generate(){
-  const style=effectiveStyle(), prompt=buildPrompt(), title=$('title').value.trim();
+  const prompt=buildPrompt(), title=$('title').value.trim();
   const instrumental=$('instrumental').checked, model=$('model').value;
+  // Cửa chặn cuối: tuyệt đối không gửi Music Style vượt giới hạn an toàn.
+  const style=compactStyleText(effectiveStyle(),model==='V4'?STYLE_SAFE_MAX_V4:STYLE_SAFE_MAX_V5);
   if(!title){ status('bad','Thiếu tiêu đề','Nhập tiêu đề bài hát ở mục 01'); return; }
   if(!style){ status('bad','Thiếu style','Chọn ít nhất một thể loại ở mục 01'); return; }
   if(!instrumental && !prompt){ status('bad','Thiếu lời','Viết lời ở mục 05, hoặc bật chế độ không lời'); return; }
+  const apiStyleLimit=model==='V4'?200:1000;
+  if(style.length>apiStyleLimit){ status('bad','Style quá dài','Ứng dụng đã chặn trước khi gửi. Hãy giảm mô tả Style.'); return; }
 
   // Khi chọn kiểu ĐỌC/NÓI: đổi MỌI nhãn đoạn hát ([Verse], [Chorus], [Bridge]...)
   // thành nhãn spoken để Suno đọc thật, không hát. Đây là điểm quyết định.
@@ -2471,7 +2505,7 @@ async function aiComposeStyle(){
   btn.disabled=true; const old=btn.textContent; btn.textContent='⏳ AI đang viết…';
   showNote('','AI đang đọc mọi khai báo và soạn prompt style tối ưu…');
   try{
-    const isV4=$('model').value==='V4'; const limit=isV4?200:900;
+    const isV4=$('model').value==='V4'; const reserve=criticalStyleLocks().join(', ').length; const maxFinal=isV4?STYLE_SAFE_MAX_V4:STYLE_SAFE_MAX_V5; const limit=isV4?Math.max(70,maxFinal-reserve-20):Math.max(260,Math.min(680,maxFinal-reserve-40));
     const sys='Bạn là chuyên gia viết prompt cho Suno AI (mô hình tạo nhạc). Nhiệm vụ: đọc toàn bộ khai báo của người dùng và viết DUY NHẤT một chuỗi prompt "style" bằng tiếng Anh, các mô tả ngăn cách bằng dấu phẩy, không xuống dòng, không markdown, không giải thích, không tiêu đề. '+
       'Prompt phải: (1) phản ánh ĐẦY ĐỦ và CHÍNH XÁC mọi khai báo (thể loại, cảm xúc, giai điệu, nhịp, giọng, âm sắc, nhạc cụ, ngôn ngữ); (2) tôn trọng TUYỆT ĐỐI cách thể hiện; (3) sắp xếp theo thứ tự ưu tiên: yếu tố quan trọng nhất đứng trước; (4) không mâu thuẫn nội bộ; (5) không nhắc tên ca sĩ/nghệ sĩ có thật; (6) ngắn gọn, súc tích, TỐI ĐA khoảng '+limit+' ký tự. '+
       'QUY TẮC CÁCH THỂ HIỆN: '+deliveryRule+' '+
@@ -2481,14 +2515,14 @@ async function aiComposeStyle(){
     let text=await geminiCall(user,sys);
     text=text.trim().replace(/^```[a-z]*\n?/i,'').replace(/```$/,'').replace(/^style\s*[:：]/i,'').replace(/\s*\n\s*/g,' ').trim();
     if(!text){ showNote('err','AI chưa trả được prompt, thử lại lần nữa.'); return; }
-    if(text.length>limit+120) text=text.slice(0,limit+120);
+    if(text.length>limit) text=compactStyleText(text,limit);
     AI_STYLE=sanitizeAiStyleForLocks(text);
     const bar=$('aiStyleBar'); if(bar) bar.style.display='flex';
     // Hiển thị prompt cuối cùng sau khi ép lại các khóa giọng/nhạc cụ/solo.
     const finalText=effectiveStyle();
     const so=$('styleOut'); so.textContent=finalText; so.classList.remove('empty');
-    const isV4b=$('model').value==='V4'; const styleMax=isV4b?200:1000;
-    const sc=$('styleCnt'); sc.textContent=finalText.length+' / '+styleMax; sc.classList.toggle('over',finalText.length>styleMax);
+    const isV4b=$('model').value==='V4'; const styleMax=isV4b?STYLE_SAFE_MAX_V4:STYLE_SAFE_MAX_V5;
+    const sc=$('styleCnt'); sc.textContent=finalText.length+' / '+styleMax+' an toàn'; sc.classList.toggle('over',finalText.length>styleMax);
     showNote('ok','Đã tạo prompt AI tối ưu. Bấm "Tạo nhạc" để dùng. Đổi bất kỳ khai báo nào sẽ quay lại prompt tự động.');
   }catch(e){
     showNote('err', e instanceof TypeError ? 'Không kết nối được Gemini API (CORS/mạng).' : e.message);
