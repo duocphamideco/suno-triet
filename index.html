@@ -774,6 +774,12 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
         <label class="lb">Giọng tham chiếu <span class="hint">(tuỳ chọn, mô tả bằng lời)</span></label>
         <input type="text" id="voiceRef" placeholder="Vd: nam trung ấm, hơi khàn, phong cách ballad thập niên 90">
       </div>
+      <div class="block">
+        <div class="tgl">
+          <div class="tx"><b>Khóa CỨNG giọng &amp; giới tính</b><small>Bật để khóa nhiều lớp: vocalGender API + Style + thẻ trong lời + Negative Style. Chọn Nam sẽ ép NAM ONLY và loại Nữ; chọn Nữ sẽ làm ngược lại. Khi bật khóa cứng, chế độ song ca sẽ tự về Đơn ca để tránh lẫn giới tính.</small></div>
+          <label class="sw"><input type="checkbox" id="strictVoice" checked><i></i></label>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -782,10 +788,17 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
     <div class="sec-head"><span class="n">03</span><h2>Phối khí</h2>
       <p>Chọn nhạc cụ theo họ. Một nhạc cụ có thể được đẩy lên làm solo nổi bật.</p></div>
     <div id="instrWrap"></div>
+    <div class="block">
+      <div class="tgl">
+        <div class="tx"><b>Khóa CỨNG nhạc cụ đã chọn</b><small>Bật để nhạc cụ giai điệu chỉ lấy từ danh sách đã chọn. Hệ thống sẽ xóa nhạc cụ mâu thuẫn ẩn trong mô tả thể loại, khóa lại trong Style + lời và ưu tiên loại guitar/piano/sax không được chọn.</small></div>
+        <label class="sw"><input type="checkbox" id="strictArrangement" checked><i></i></label>
+      </div>
+    </div>
     <div class="block grid2">
       <div>
-        <label class="lb">Nhạc cụ solo nổi bật</label>
+        <label class="lb">Nhạc cụ solo bắt buộc</label>
         <select id="solo"><option value="">Không chỉ định</option></select>
+        <div class="hint" style="margin-top:6px">Khi chọn, hệ thống vừa khóa trong Style vừa tự chèn một cue <b>[Instrumental Solo]</b> vào lời gửi Suno.</div>
       </div>
       <div>
         <label class="lb">Không gian âm thanh</label>
@@ -796,6 +809,36 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
           <option value="live band recording, room ambience">Thu live cả ban nhạc</option>
           <option value="lo-fi tape saturation, vinyl warmth">Lo-fi, băng cối</option>
           <option value="modern polished pop production, punchy master">Pop hiện đại, master chắc</option>
+        </select>
+      </div>
+    </div>
+    <div class="block grid3" id="soloOptions">
+      <div>
+        <label class="lb">Vị trí đoạn solo</label>
+        <select id="soloPosition">
+          <option value="auto">Tự động · ưu tiên trước Bridge/Final Chorus</option>
+          <option value="before_bridge">Trước Bridge</option>
+          <option value="before_final">Trước Final Chorus</option>
+          <option value="before_outro">Trước Outro</option>
+          <option value="end">Cuối bài</option>
+        </select>
+      </div>
+      <div>
+        <label class="lb">Độ dài solo</label>
+        <select id="soloBars">
+          <option value="4">4 ô nhịp · ngắn</option>
+          <option value="8" selected>8 ô nhịp · tiêu chuẩn</option>
+          <option value="12">12 ô nhịp · nổi bật</option>
+          <option value="16">16 ô nhịp · dài</option>
+        </select>
+      </div>
+      <div>
+        <label class="lb">Cách solo</label>
+        <select id="soloMode">
+          <option value="spotlight">Solo nổi bật · nhạc khác lùi nền</option>
+          <option value="callresponse">Solo đối đáp với giọng hát</option>
+          <option value="emotional">Solo cảm xúc · ngân dài</option>
+          <option value="virtuoso">Solo kỹ thuật · cao trào</option>
         </select>
       </div>
     </div>
@@ -867,6 +910,8 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn solid" id="analyze">Phân tích lời</button>
         <button class="btn" id="aiCheckCuongAm">🤖 AI kiểm tra cưỡng âm (Gemini)</button>
+        <button class="btn" id="aiAutoFixCuongAm">✨ AI tự sửa + phân tích lại</button>
+        <button class="btn quiet" id="undoCuongAm" disabled>↩ Khôi phục lời trước sửa</button>
         <button class="btn quiet" id="clearAn">Xoá kết quả</button>
       </div>
     </div>
@@ -917,6 +962,7 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
 
       <div class="rowsp"><b>Loại trừ</b></div>
       <input type="text" id="negTags" placeholder="Vd: heavy metal, distorted guitar">
+      <div class="hint" id="autoNegPreview" style="margin-top:6px">Negative Style gửi đi (0/180): —</div>
 
       <div class="rowsp model-rowsp"><b>Mô hình</b></div>
       <select id="model">
@@ -1291,7 +1337,7 @@ Object.values(INSTR).forEach(a=>a.forEach(([l,t])=>TAG[l]=t));
 /* ==========================================================
    TRẠNG THÁI
    ========================================================== */
-const DEF={genre:['Ballad Việt'],contour:[],mood:[],timbre:[],delivery:['Hát'],instr:['Piano','Guitar mộc'],
+const DEF={genre:['Ballad Việt'],contour:[],mood:[],timbre:[],delivery:['Hát'],instr:[],
   voice:'Nữ ngọt ngào',duet:'solo',lang:'vi'};
 let S=JSON.parse(JSON.stringify(DEF));
 try{ const sv=localStorage.getItem('studio_state_v2'); if(sv) S=Object.assign(S,JSON.parse(sv)); }catch(e){}
@@ -1303,9 +1349,10 @@ function persist(){
       title:$('title').value,idea:$('idea').value,creativeBrief:$('creativeBrief')?$('creativeBrief').value:'',
       creativeLevel:$('creativeLevel')?$('creativeLevel').value:'emotional',melodyHint:$('melodyHint')?$('melodyHint').value:'',
       lyrics:$('lyrics').value,bpm:$('bpm').value,key:$('key').value,duration:$('duration').value,space:$('space').value,solo:$('solo').value,
+      soloPosition:$('soloPosition')?$('soloPosition').value:'auto',soloBars:$('soloBars')?$('soloBars').value:'8',soloMode:$('soloMode')?$('soloMode').value:'spotlight',
       voiceRef:$('voiceRef').value,negTags:$('negTags').value,model:$('model').value,
       ratio:$('ratio').value,placement:$('placement').value,instrumental:$('instrumental').checked,
-      toneGuard:$('toneGuard').checked,nativeAcc:$('nativeAcc').checked,
+      toneGuard:$('toneGuard').checked,nativeAcc:$('nativeAcc').checked,strictVoice:$('strictVoice')?$('strictVoice').checked:true,strictArrangement:$('strictArrangement')?$('strictArrangement').checked:true,
       dV1:$('dV1').value,dCh:$('dCh').value,dBr:$('dBr').value
     }));
   }catch(e){}
@@ -1334,7 +1381,15 @@ function buildVoices(){
     const b=document.createElement('button');
     b.className='voice'+(S.voice===v.l?' on':''); b.type='button';
     b.innerHTML='<span class="g">'+(v.g==='m'?'NAM':v.g==='f'?'NỮ':'ĐẶC')+'</span><span><b>'+v.l+'</b><small>'+v.d+'</small></span>';
-    b.addEventListener('click',()=>{ S.voice=v.l; buildVoices(); sync(true); });
+    b.addEventListener('click',()=>{
+      S.voice=v.l;
+      if($('strictVoice')&&$('strictVoice').checked && v.g && S.duet!=='solo'){
+        S.duet='solo';
+        seg('cDuet',DUET.map(d=>[d[0],d[1]]),'duet',refreshDuetVis);
+        refreshDuetVis();
+      }
+      buildVoices(); sync(true);
+    });
     el.appendChild(b);
   });
 }
@@ -1344,7 +1399,13 @@ function seg(host,items,key,after){
     const val=it[0], lab=it[1];
     const b=document.createElement('button');
     b.className=(S[key]===val?'on':''); b.type='button'; b.textContent=lab;
-    b.addEventListener('click',()=>{ S[key]=val; seg(host,items,key,after); if(after)after(); sync(true); });
+    b.addEventListener('click',()=>{
+      S[key]=val;
+      if(key==='duet' && val!=='solo' && $('strictVoice')&&$('strictVoice').checked){
+        $('strictVoice').checked=false;
+      }
+      seg(host,items,key,after); if(after)after(); sync(true);
+    });
     el.appendChild(b);
   });
 }
@@ -1358,7 +1419,18 @@ function buildInstr(){
       const b=document.createElement('button');
       b.className='chip'+(S.instr.includes(l)?' on':''); b.type='button'; b.textContent=l;
       b.addEventListener('click',()=>{
-        const i=S.instr.indexOf(l); if(i>-1)S.instr.splice(i,1); else S.instr.push(l);
+        const i=S.instr.indexOf(l);
+        if(i>-1){
+          S.instr.splice(i,1);
+        }else{
+          // Bản cũ từng mặc định Piano + Guitar mộc. Khi bật khóa nhạc cụ và người dùng chọn
+          // một lead mới, bỏ bộ mặc định cũ để tránh Suno tiếp tục ưu tiên guitar/piano ngoài ý muốn.
+          const strict=$('strictArrangement') ? $('strictArrangement').checked : true;
+          const legacyDefault=S.instr.length===2 && S.instr.includes('Piano') && S.instr.includes('Guitar mộc');
+          const melodicLead=!['Bass điện','Trống mộc','Trống máy','Cajon','Bongo / Conga','Tambourine','Vỗ tay','Song loan','Trống cơm','Beat lo-fi','Vinyl crackle','808 sub','Pad khí quyển','Synth pad'].includes(l);
+          if(strict && legacyDefault && melodicLead && !['Piano','Guitar mộc'].includes(l)) S.instr=[];
+          S.instr.push(l);
+        }
         buildInstr(); fillSolo(); sync(true);
       });
       c.appendChild(b);
@@ -1413,6 +1485,233 @@ function langInfo(){
   const m=LANG.find(x=>x[0]===S.lang)||LANG[0];
   return {code:m[0],label:m[1],tag:m[2]};
 }
+/* Khóa giọng / nhạc cụ: đặt từ khóa quan trọng lên ĐẦU prompt và tự tạo negative tags.
+   Mục tiêu là giảm trường hợp Suno tự thay nhạc cụ hoặc làm sai chất giọng đã chọn. */
+const VOICE_LOCK={
+  'Nam trầm ấm':{pos:'mature warm low-mid baritone, rounded chest resonance, intimate and grounded throughout',neg:'bright youthful tenor, thin clean male vocal'},
+  'Nam trầm sâu':{pos:'deep dark bass-baritone, strongly resonant low register, mature cinematic chest voice throughout',neg:'bright high tenor, youthful thin male vocal'},
+  'Nam trung tình cảm':{pos:'tender emotive mid tenor, warm human tone, soft expressive phrasing throughout',neg:'cold metallic vocal, harsh aggressive vocal'},
+  'Nam Bolero mùi':{pos:'mature sentimental vietnamese bolero male voice, warm nasal resonance, tasteful emotional ornaments throughout',neg:'modern bright pop tenor, sterile clean vocal'},
+  'Nam Cải lương':{pos:'southern vietnamese cai luong male voice, vong co phrasing, dramatic sustained ornamentation throughout',neg:'western pop vocal styling, straight unornamented delivery'},
+  'Nam dân ca':{pos:'natural vietnamese folk male voice, rustic clear diction, traditional ornamentation throughout',neg:'polished western pop vocal, heavy autotune'},
+  'Nam cao sáng':{pos:'bright strong high tenor, open ringing upper register throughout',neg:'dark bass-baritone, smoky low vocal'},
+  'Nam Pop trẻ':{pos:'youthful modern pop male voice, clean close-mic tone, crisp diction throughout',neg:'old smoky baritone, heavy rasp'},
+  'Nam Soul':{pos:'rich soulful male vocal, dynamic chest voice, controlled grit and expressive runs throughout',neg:'flat emotionless vocal, childlike clean tone'},
+  'Nam khàn bụi':{pos:'distinctly raspy husky grainy mature male vocal throughout, audible natural vocal grit, rough textured edges, never polished clean',neg:'clean pristine male vocal, crystalline clear vocal, bright youthful tenor, smooth glossy pop vocal'},
+  'Nữ ngọt ngào':{pos:'sweet soft warm female vocal, intimate gentle tone throughout',neg:'harsh raspy female vocal, aggressive belting'},
+  'Nữ trong trẻo':{pos:'clear crystalline bright clean female vocal throughout, pure transparent tone',neg:'husky smoky female vocal, raspy gritty vocal'},
+  'Nữ trữ tình sâu':{pos:'warm mature emotional mezzo-soprano, rich intimate mid-low register throughout',neg:'thin childlike soprano, bright youthful pop vocal'},
+  'Nữ Bolero mùi':{pos:'sentimental vietnamese bolero female voice, warm mature vibrato and tasteful traditional slides throughout',neg:'sterile straight pop vocal, childlike bright vocal'},
+  'Nữ Cải lương':{pos:'southern vietnamese cai luong female voice, vong co inspired phrasing, dramatic sustained vibrato throughout',neg:'western pop vocal styling, straight unornamented delivery'},
+  'Nữ dân ca':{pos:'traditional vietnamese folk female voice, natural clear diction and graceful regional ornaments throughout',neg:'heavy autotune, western glossy pop vocal'},
+  'Nữ khàn cá tính':{pos:'distinctly husky smoky raspy female vocal throughout, textured mature tone, audible breath and grain',neg:'crystalline clean female vocal, bright youthful soprano, glossy pristine pop vocal'},
+  'Nữ alto khói':{pos:'low smoky dark alto female vocal, velvety mature chest resonance throughout',neg:'bright high soprano, childlike thin female vocal'},
+  'Nữ cao nội lực':{pos:'powerful resonant female soprano with controlled strong belting throughout',neg:'weak breathy vocal, low smoky alto'},
+  'Nữ Pop hiện đại':{pos:'modern polished female pop vocal, bright controlled tone and crisp diction throughout',neg:'rough folk vocal, heavy rasp'},
+  'Nữ Soul / R&B':{pos:'soulful smooth female r&b vocal, intimate dynamics and controlled runs throughout',neg:'flat straight vocal, harsh rock rasp'},
+  'Giọng trung tính':{pos:'androgynous contemporary vocal, smooth neutral timbre throughout',neg:'strongly gendered operatic vocal'},
+  'Giọng trẻ em':{pos:'natural young child voice, innocent light tone throughout',neg:'mature adult baritone, mature adult alto'},
+  'Giọng thủ thỉ':{pos:'breathy intimate close-mic whisper-like vocal, soft airy delivery throughout',neg:'loud belting, shouted vocal'}
+};
+const COMMON_LEAD_NEG=[
+  ['Guitar mộc','acoustic guitar'],['Guitar điện','electric guitar'],['Guitar slide','slide guitar'],['Piano','piano'],
+  ['Saxophone','saxophone'],['Synth lead','synth lead'],['Violin','violin'],['Đàn tranh','dan tranh zither'],['Đàn bầu','dan bau monochord']
+];
+
+/* Hồ sơ nhạc cụ dùng cho KHÓA CỨNG. Mô tả giàu đặc trưng âm học để Suno ít nhầm
+   nhạc cụ Việt với guitar/lead phổ thông. */
+const INSTR_LOCK_PROFILE={
+  'Đàn cò':'Vietnamese dan co (dan nhi), bowed two-string fiddle, sustained bow strokes, nasal expressive bowed-string timbre',
+  'Đàn bầu':'Vietnamese dan bau monochord, one-string zither, expressive gliding pitch bends, natural harmonics and overtone slides',
+  'Đàn tranh':'Vietnamese dan tranh zither, bright plucked zither timbre, tremolo and traditional ornamented glissando',
+  'Đàn nguyệt':'Vietnamese dan nguyet moon lute, round two-string lute timbre, crisp traditional plucked articulation',
+  'Đàn kìm':'Vietnamese dan kim moon lute, traditional two-string plucked lute articulation',
+  'Đàn sến':'Vietnamese dan sen lute, bright traditional southern vietnamese plucked-lute timbre',
+  'Guitar phím lõm':'Vietnamese scalloped-fret guitar, cai luong pitch bends and expressive glides',
+  'Sáo trúc':'Vietnamese bamboo flute, breathy bamboo tone and traditional ornaments',
+  'Sáo mèo':'Hmong bamboo flute, airy reedy folk timbre',
+  "T'rưng":'Vietnamese T-rung bamboo xylophone, resonant struck bamboo tubes',
+  'Song loan':'Vietnamese song loan percussion',
+  'Trống cơm':'Vietnamese com drum',
+  'Piano':'grand piano',
+  'Piano điện':'rhodes electric piano',
+  'Guitar mộc':'acoustic guitar',
+  'Guitar điện':'electric guitar',
+  'Guitar slide':'slide guitar',
+  'Violin':'violin',
+  'Cello':'cello',
+  'Saxophone':'tenor saxophone',
+  'Harmonica':'harmonica'
+};
+
+/* Một số preset thể loại cũ có nhúng sẵn guitar/piano/accordion.
+   Khi khóa nhạc cụ, dùng bản "rhythm/feel only" để không tự kéo nhạc cụ ngoài lựa chọn. */
+const STRICT_GENRE_TAG={
+  'Vietnamese Bolero':'vietnamese bolero, slow romantic bolero rhythm, nostalgic southern vietnamese sentiment, intimate sentimental phrasing',
+  'Disco':'classic disco, four-on-the-floor dance groove, glamorous retro dancefloor energy, syncopated dance pulse',
+  'Pop Ballad':'modern pop ballad, emotional storytelling, intimate verse, soaring memorable chorus',
+  'Lambada':'lambada dance rhythm, sensual brazilian-caribbean groove, syncopated percussion, tropical romantic energy',
+  'Piano ballad':'slow lyrical ballad, intimate emotional storytelling, spacious accompaniment adapted to selected instruments',
+  'Indie / Acoustic':'intimate indie songwriting, organic sparse arrangement adapted to selected instruments',
+  'Country':'country folk storytelling and rhythm, selected instruments carry all melodic parts',
+  'Rock':'alternative rock energy, strong rhythmic drive, selected instruments carry the full melodic identity',
+  'Nhạc phim':'cinematic dramatic score, evolving dynamics, selected instruments carry the melodic identity'
+};
+
+function instrDesc(l){ return INSTR_LOCK_PROFILE[l] || TAG[l] || l; }
+function selectedHas(re){ return S.instr.some(x=>re.test(x)); }
+function voiceGender(){
+  const v=VOICE.find(x=>x.l===S.voice); return v&&v.g?v.g:'';
+}
+function hardGenderText(){
+  if($('instrumental').checked || !($('strictVoice')&&$('strictVoice').checked) || S.duet!=='solo') return '';
+  const g=voiceGender();
+  if(g==='m') return 'MALE VOCAL ONLY: one single adult male lead singer for the entire song, all lead and backing vocals performed by male voices only';
+  if(g==='f') return 'FEMALE VOCAL ONLY: one single adult female lead singer for the entire song, all lead and backing vocals performed by female voices only';
+  return '';
+}
+
+function voiceLockText(){
+  if($('instrumental').checked || !($('strictVoice')&&$('strictVoice').checked)) return '';
+  const r=VOICE_LOCK[S.voice];
+  const g=hardGenderText();
+  const timbre=r ? 'VOICE TIMBRE LOCK: '+r.pos : '';
+  return [g,timbre].filter(Boolean).join('; ');
+}
+function selectedInstrumentTags(){ return S.instr.map(l=>instrDesc(l)).filter(Boolean); }
+function instrumentLockText(){
+  if(!($('strictArrangement')&&$('strictArrangement').checked) || !S.instr.length) return '';
+  const exact=selectedInstrumentTags();
+  if(exact.length===1){
+    return 'INSTRUMENT HARD LOCK: ONLY melodic lead instrument is '+exact[0]+'; it must be clearly audible in intro, fills and interludes; all other melodic lead instruments are excluded';
+  }
+  return 'INSTRUMENT HARD LOCK: ONLY selected melodic instruments may lead: '+exact.join(' + ')+'; all unselected melodic lead instruments are excluded';
+}
+function soloLockText(){
+  const s=$('solo')&&$('solo').value; if(!s) return '';
+  const bars=$('soloBars')?$('soloBars').value:'8';
+  const mode=$('soloMode')?$('soloMode').value:'spotlight';
+  const modeText={spotlight:'other instruments pull back',callresponse:'call-and-response with the vocal around the solo',emotional:'emotional sustained expressive phrases',virtuoso:'virtuosic climactic performance'}[mode]||'other instruments pull back';
+  return 'MANDATORY SOLO: '+bars+'-bar featured '+(TAG[s]||s)+' instrumental solo, '+modeText+', no vocals during the solo';
+}
+function criticalStyleLocks(){
+  const a=[]; const v=voiceLockText(), i=instrumentLockText(), s=soloLockText();
+  if(v)a.push(v); if(i)a.push(i); if(s)a.push(s); return a;
+}
+const NEG_STYLE_MAX=180; // Kie/Suno giới hạn 200 ký tự; chừa biên an toàn.
+function splitNegPhrases(text){
+  return String(text||'').split(/[,;]+/).map(x=>x.trim()).filter(Boolean);
+}
+function compactNegativeStyle(parts,maxLen=NEG_STYLE_MAX){
+  const seen=new Set(), out=[];
+  for(const raw of parts){
+    const p=String(raw||'').replace(/\s+/g,' ').trim();
+    if(!p) continue;
+    const k=p.toLowerCase(); if(seen.has(k)) continue;
+    const next=(out.length?out.join(', ')+', ':'')+p;
+    if(next.length>maxLen) continue;
+    seen.add(k); out.push(p);
+  }
+  return out.join(', ');
+}
+function autoNegativeParts(){
+  const out=[];
+  // Ưu tiên cao nhất: giới tính đối nghịch.
+  if(!$('instrumental').checked && $('strictVoice')&&$('strictVoice').checked && S.duet==='solo'){
+    const g=voiceGender();
+    if(g==='m') out.push('female vocal','female singer','female voice','female backing vocals','soprano');
+    else if(g==='f') out.push('male vocal','male singer','male voice','male backing vocals','tenor','baritone');
+  }
+
+  // Sau đó mới tới nhạc cụ ngoài lựa chọn. Guitar được ưu tiên loại vì Suno rất hay tự chen guitar.
+  if($('strictArrangement')&&$('strictArrangement').checked && S.instr.length){
+    const selected=new Set(S.instr);
+    const hasAnyGuitar=['Guitar mộc','Guitar điện','Guitar slide','Guitar phím lõm'].some(x=>selected.has(x));
+    if(!hasAnyGuitar) out.push('acoustic guitar','electric guitar','guitar lead','plucked guitar');
+    if(!selected.has('Piano') && !selected.has('Piano điện')) out.push('piano lead');
+    if(!selected.has('Saxophone')) out.push('saxophone lead');
+    if(!selected.has('Synth lead')) out.push('synth lead');
+    if(!selected.has('Violin') && !selected.has('Đàn cò')) out.push('violin lead');
+  }
+  return out;
+}
+function autoNegativeTags(){
+  return compactNegativeStyle(autoNegativeParts(),NEG_STYLE_MAX);
+}
+function effectiveNegativeTags(){
+  // Khóa tự động phải đứng trước để không bị nội dung nhập tay chiếm hết giới hạn 180 ký tự.
+  const manual=splitNegPhrases($('negTags').value.trim());
+  return compactNegativeStyle([...autoNegativeParts(),...manual],NEG_STYLE_MAX);
+}
+function updateAutoNegPreview(){
+  const el=$('autoNegPreview'); if(!el)return;
+  const n=effectiveNegativeTags();
+  el.textContent='Negative Style gửi đi ('+(n?n.length:0)+'/'+NEG_STYLE_MAX+'): '+(n||'—');
+}
+
+function forbiddenInstrumentRegexes(){
+  if(!($('strictArrangement')&&$('strictArrangement').checked) || !S.instr.length) return [];
+  const selected=new Set(S.instr), rx=[];
+  const hasAnyGuitar=['Guitar mộc','Guitar điện','Guitar slide','Guitar phím lõm'].some(x=>selected.has(x));
+  if(!hasAnyGuitar) rx.push(/\bguitar\b/i,/\bacoustic guitar\b/i,/\belectric guitar\b/i,/\bslide guitar\b/i);
+  if(!selected.has('Piano')&&!selected.has('Piano điện')) rx.push(/\bpiano\b/i,/\brhodes\b/i);
+  if(!selected.has('Saxophone')) rx.push(/\bsax(?:ophone)?\b/i);
+  if(!selected.has('Synth lead')) rx.push(/\bsynth lead\b/i);
+  if(!selected.has('Violin')&&!selected.has('Đàn cò')) rx.push(/\bviolin\b/i);
+  if(!selected.has('Đàn bầu')) rx.push(/\bdan bau\b/i);
+  if(!selected.has('Đàn tranh')) rx.push(/\bdan tranh\b/i);
+  return rx;
+}
+function sanitizeAiStyleForLocks(raw){
+  let segs=String(raw||'').split(',').map(x=>x.trim()).filter(Boolean);
+  if(!$('instrumental').checked && $('strictVoice')&&$('strictVoice').checked && S.duet==='solo'){
+    const g=voiceGender();
+    if(g==='m') segs=segs.filter(s=>!/\b(female|woman|girl|soprano|mezzo[- ]?soprano|alto female)\b/i.test(s));
+    if(g==='f') segs=segs.filter(s=>!/\b(male|man|boy|tenor|baritone|bass-baritone)\b/i.test(s));
+  }
+  const irx=forbiddenInstrumentRegexes();
+  if(irx.length) segs=segs.filter(s=>!irx.some(r=>r.test(s)));
+  return segs.join(', ');
+}
+function hardPromptCues(){
+  const cues=[];
+  if(!$('instrumental').checked && $('strictVoice')&&$('strictVoice').checked && S.duet==='solo'){
+    const g=voiceGender();
+    if(g==='m') cues.push('[Male Vocal Only: single adult male lead singer throughout]');
+    else if(g==='f') cues.push('[Female Vocal Only: single adult female lead singer throughout]');
+  }
+  if($('strictArrangement')&&$('strictArrangement').checked && S.instr.length){
+    const xs=selectedInstrumentTags();
+    const only=xs.length===1?'only melodic lead: ':'only melodic leads: ';
+    cues.push('[Instrumentation: '+only+xs.join(' + ')+'; no unselected melodic lead instruments]');
+  }
+  return cues;
+}
+
+function soloCue(){
+  const s=$('solo')&&$('solo').value; if(!s)return '';
+  const bars=$('soloBars')?$('soloBars').value:'8';
+  const mode=$('soloMode')?$('soloMode').value:'spotlight';
+  const modeText={spotlight:'featured lead, other instruments pull back',callresponse:'featured lead, call and response feel',emotional:'emotional sustained expressive phrasing',virtuoso:'virtuosic climactic solo'}[mode]||'featured lead';
+  return '[Instrumental Solo: '+(TAG[s]||s)+', '+bars+' bars, '+modeText+', no vocals]';
+}
+function injectSoloCue(raw){
+  const cue=soloCue(); if(!cue || !raw)return raw;
+  // Nếu lời đã có một nhãn solo thì chuẩn hóa nhãn đó thành cue chính xác đã chọn.
+  if(/^\s*\[[^\]]*solo[^\]]*\]\s*$/im.test(raw)) return raw.replace(/^\s*\[[^\]]*solo[^\]]*\]\s*$/im,cue);
+  const pos=$('soloPosition')?$('soloPosition').value:'auto';
+  const insertBefore=(re)=> re.test(raw) ? raw.replace(re,cue+'\n\n$&') : '';
+  let x='';
+  if(pos==='before_bridge') x=insertBefore(/^\s*\[Bridge[^\]]*\]/im);
+  else if(pos==='before_final') x=insertBefore(/^\s*\[(?:Final\s+Chorus|Chorus\s+Final)[^\]]*\]/im);
+  else if(pos==='before_outro') x=insertBefore(/^\s*\[Outro[^\]]*\]/im);
+  else if(pos==='auto'){
+    x=insertBefore(/^\s*\[Bridge[^\]]*\]/im) || insertBefore(/^\s*\[(?:Final\s+Chorus|Chorus\s+Final)[^\]]*\]/im) || insertBefore(/^\s*\[Outro[^\]]*\]/im);
+  }
+  if(x)return x;
+  return raw.replace(/\s+$/,'')+'\n\n'+cue;
+}
+
 /* Các nhãn "Cách thể hiện" KHÔNG phải hát -> cần ép Suno bỏ giai điệu giọng.
    Mỗi nhãn kèm chỉ dẫn mạnh đưa lên đầu prompt. */
 const SPOKEN_DELIVERY={
@@ -1423,6 +1722,8 @@ const SPOKEN_DELIVERY={
 };
 function buildStyle(){
   const p=[], instrumental=$('instrumental').checked;
+  // Các khóa quan trọng đứng đầu prompt để tăng xác suất Suno tuân thủ.
+  criticalStyleLocks().forEach(x=>p.push(x));
   // Phát hiện chế độ thể hiện không-hát dựa trên lựa chọn "Cách thể hiện"
   const spokenPicked=(!instrumental)? S.delivery.filter(l=>SPOKEN_DELIVERY[l]) : [];
   const spokenMode=spokenPicked.length>0;
@@ -1430,22 +1731,26 @@ function buildStyle(){
   // Khi ở chế độ đọc/thì thầm/hát nói: đẩy chỉ dẫn spoken lên ĐẦU prompt (trọng số cao nhất)
   if(spokenMode) spokenPicked.forEach(l=>p.push(SPOKEN_DELIVERY[l]));
 
-  S.genre.forEach(l=>p.push(TAG[l]));
+  S.genre.forEach(l=>{
+    const strict=($('strictArrangement')&&$('strictArrangement').checked);
+    p.push(strict ? (STRICT_GENRE_TAG[l]||TAG[l]) : TAG[l]);
+  });
   // Ở chế độ spoken, bỏ contour "ngân cao/luyến láy" vì mâu thuẫn với đọc
   if(!spokenMode) S.contour.forEach(l=>p.push(TAG[l]));
   S.mood.forEach(l=>p.push(TAG[l]));
   const bpm=$('bpm').value; if(bpm) p.push(bpm+' BPM');
   if($('key').value) p.push('in '+$('key').value);
-  if(S.instr.length) p.push(S.instr.map(l=>TAG[l]).join(', '));
-  if($('solo').value) p.push('featuring '+TAG[$('solo').value]+' solo');
+  if(S.instr.length && !($('strictArrangement')&&$('strictArrangement').checked)) p.push(S.instr.map(l=>TAG[l]).join(', '));
+  if($('solo').value && !($('strictArrangement')&&$('strictArrangement').checked)) p.push('featuring '+TAG[$('solo').value]+' solo');
   if($('space').value) p.push($('space').value);
 
   if(instrumental){ p.push('instrumental only, no vocals'); }
   else{
     const v=VOICE.find(x=>x.l===S.voice);
     if(v){
-      // Ở chế độ spoken: giữ chất giọng nhưng đổi "vocal" -> "voice" để không gợi ca hát
-      p.push(spokenMode ? (v.t.replace(/\bvocals?\b/gi,'voice')+', speaking voice') : v.t);
+      // Ở chế độ spoken luôn dùng mô tả giọng nói. Khi hát và bật khóa giọng, VOICE LOCK ở đầu prompt đã mang đặc điểm mạnh hơn.
+      if(spokenMode) p.push(v.t.replace(/\bvocals?\b/gi,'voice')+', speaking voice');
+      else if(!($('strictVoice')&&$('strictVoice').checked)) p.push(v.t);
     }
     // Timbre luyến láy/vibrato/ngân... chỉ có nghĩa khi hát -> bỏ ở chế độ spoken
     if(!spokenMode) S.timbre.forEach(l=>p.push(TAG[l]));
@@ -1480,7 +1785,12 @@ function buildStyle(){
   if($('melodyHint') && $('melodyHint').value.trim()) p.push($('melodyHint').value.trim().slice(0,420));
   return p.filter(Boolean).join(', ');
 }
-function buildPrompt(){ return $('lyrics').value.trim(); }
+function buildPrompt(){
+  let raw=injectSoloCue($('lyrics').value.trim());
+  const cues=hardPromptCues();
+  if(cues.length && raw) raw=cues.join('\n')+'\n'+raw;
+  return raw;
+}
 
 function summary(){
   const parts=[];
@@ -1491,13 +1801,20 @@ function summary(){
     parts.push('<b>Thể hiện:</b> '+(S.delivery.join(' · ')||'—'));
   }
   parts.push('<b>Nhạc cụ:</b> '+(S.instr.length?S.instr.join(' · '):'—'));
+  if($('solo')&&$('solo').value) parts.push('<b>Solo:</b> '+$('solo').value+' · '+($('soloBars')?$('soloBars').value:'8')+' ô nhịp');
+  parts.push('<b>Khóa:</b> '+(($('strictVoice')&&$('strictVoice').checked)?'giọng ✓':'giọng —')+' · '+(($('strictArrangement')&&$('strictArrangement').checked)?'nhạc cụ ✓':'nhạc cụ —'));
   parts.push('<b>Ngôn ngữ:</b> '+langInfo().label);
   parts.push('<b>Nhịp:</b> '+$('bpm').value+' BPM'+($('key').value?' · '+$('key').value:''));
   return parts.join('<br>');
 }
 
 let AI_STYLE=null; /* prompt style do AI tối ưu; null = dùng buildStyle() tự động */
-function effectiveStyle(){ return (AI_STYLE && AI_STYLE.trim()) ? AI_STYLE.trim() : buildStyle(); }
+function effectiveStyle(){
+  if(!(AI_STYLE && AI_STYLE.trim())) return buildStyle();
+  const clean=sanitizeAiStyleForLocks(AI_STYLE.trim());
+  const locks=criticalStyleLocks();
+  return locks.length ? locks.join(', ')+(clean?', '+clean:'') : clean;
+}
 function clearAiStyle(){ if(AI_STYLE!==null){ AI_STYLE=null; const bar=$('aiStyleBar'); if(bar) bar.style.display='none'; } }
 function sync(fromUserChange){
   if(fromUserChange) clearAiStyle();
@@ -1517,6 +1834,8 @@ function sync(fromUserChange){
   $('modelBadge').textContent='SUNO '+$('model').value.replace('_','.').replace('V','V');
   const mobileModel=$('modelMobile'); if(mobileModel && mobileModel.value!==$('model').value) mobileModel.value=$('model').value;
   $('vocalZone').classList.toggle('dim',$('instrumental').checked);
+  const soloOpts=$('soloOptions'); if(soloOpts) soloOpts.classList.toggle('dim',!$('solo').value);
+  updateAutoNegPreview();
   $('duration').disabled=$('model').value!=='V5_5';
   $('bpmVal').textContent=$('bpm').value;
   $('ratioVal').textContent=$('ratio').value;
@@ -1864,12 +2183,18 @@ async function generate(){
   }
   const payload={customMode:true,instrumental,model,style,title,callBackUrl:'https://kie.ai/callback-not-used'};
   if(!instrumental) payload.prompt=prompt2;
-  const neg=$('negTags').value.trim(); if(neg) payload.negativeTags=neg;
+  const neg=effectiveNegativeTags().slice(0,NEG_STYLE_MAX); if(neg) payload.negativeTags=neg;
   if(!instrumental && S.duet==='solo'){
-    const v=VOICE.find(x=>x.l===S.voice); if(v&&v.g) payload.vocalGender=v.g;
+    const v=VOICE.find(x=>x.l===S.voice);
+    if(v&&v.g) payload.vocalGender=v.g; // Kie: m=male, f=female
   }
-  const sw=parseFloat($('styleWeight').value); if(!isNaN(sw)) payload.styleWeight=sw;
-  const wc=parseFloat($('weird').value); if(!isNaN(wc)) payload.weirdnessConstraint=wc;
+  const sw=parseFloat($('styleWeight').value);
+  const hardVoice=!!($('strictVoice')&&$('strictVoice').checked&&!instrumental&&S.duet==='solo'&&voiceGender());
+  const hardInstr=!!($('strictArrangement')&&$('strictArrangement').checked&&S.instr.length);
+  const strictOn=hardVoice||hardInstr||!!$('solo').value;
+  // Chế độ khóa cứng: đẩy bám style lên tối đa và giảm weirdness gần 0.
+  if(!isNaN(sw)) payload.styleWeight=strictOn?1.00:sw;
+  const wc=parseFloat($('weird').value); if(!isNaN(wc)) payload.weirdnessConstraint=strictOn?0.00:wc;
   // 'duration' KHONG phai tham so hop le cua /api/v1/generate - da bo de tranh loi API.
 
   $('genBtn').disabled=true; $('genBtn2').disabled=true;
@@ -2110,13 +2435,15 @@ async function aiComposeStyle(){
   decl.push('- Cảm xúc/không khí: '+(S.mood.join(', ')||'chưa chọn'));
   decl.push('- Đường nét giai điệu: '+(S.contour.join(', ')||'chưa chọn'));
   decl.push('- Nhịp/Tone: '+($('bpm').value||'?')+' BPM'+($('key').value?', key '+$('key').value:''));
-  decl.push('- Nhạc cụ / phối khí (bám sát danh sách này): '+(S.instr.length?S.instr.map(l=>l+' ('+TAG[l]+')').join('; '):'chưa chọn'));
-  if($('solo').value) decl.push('- Nhạc cụ solo nổi bật: '+$('solo').value+' ('+TAG[$('solo').value]+')');
+  decl.push('- Nhạc cụ / phối khí (BẮT BUỘC bám đúng danh sách này): '+(S.instr.length?S.instr.map(l=>l+' ('+TAG[l]+')').join('; '):'chưa chọn'));
+  if($('strictArrangement')&&$('strictArrangement').checked) decl.push('- KHÓA NHẠC CỤ: không được thay nhạc cụ lead đã chọn bằng guitar/piano/sax/synth hoặc lead khác không có trong danh sách.');
+  if($('solo').value) decl.push('- SOLO BẮT BUỘC: '+$('solo').value+' ('+TAG[$('solo').value]+'), '+($('soloBars')?$('soloBars').value:'8')+' ô nhịp, '+($('soloMode')?$('soloMode').value:'spotlight')+', không hát trong đoạn solo.');
   if($('space').value) decl.push('- Không gian âm thanh: '+$('space').value);
   if(instrumental){
     decl.push('- CHẾ ĐỘ: BẢN KHÔNG LỜI (instrumental), tuyệt đối KHÔNG có giọng người.');
   }else{
     decl.push('- Giọng ca sĩ: '+(v?S.voice+' ('+v.t+', giới tính '+(v.g==='m'?'nam':v.g==='f'?'nữ':'trung tính')+')':'chưa chọn'));
+    if($('strictVoice')&&$('strictVoice').checked && VOICE_LOCK[S.voice]) decl.push('- KHÓA CHẤT GIỌNG: '+VOICE_LOCK[S.voice].pos+'; TUYỆT ĐỐI TRÁNH: '+VOICE_LOCK[S.voice].neg);
     decl.push('- Âm sắc/kỹ thuật giọng: '+(S.timbre.length?S.timbre.map(l=>l+' ('+TAG[l]+')').join('; '):'không chỉ định'));
     decl.push('- CÁCH THỂ HIỆN (ƯU TIÊN TỐI CAO): '+(S.delivery.join(', ')||'Hát'));
     if(dObj && dObj[0]!=='solo') decl.push('- Chế độ song ca: '+dObj[1]+' ('+dObj[2]+')');
@@ -2127,7 +2454,8 @@ async function aiComposeStyle(){
   if($('creativeBrief') && $('creativeBrief').value.trim()) decl.push('- Concept/ý tưởng bài: '+$('creativeBrief').value.trim().slice(0,500));
   if($('melodyHint') && $('melodyHint').value.trim()) decl.push('- Chỉ dẫn giai điệu: '+$('melodyHint').value.trim().slice(0,300));
   decl.push('- Mức sáng tạo: '+creativeProfile());
-  if($('negTags').value.trim()) decl.push('- Cần tránh (không đưa vào): '+$('negTags').value.trim());
+  const negAll=effectiveNegativeTags();
+  if(negAll) decl.push('- Cần tránh / negative tags: '+negAll);
 
   // Quy tắc cách thể hiện để AI tuân thủ tuyệt đối
   let deliveryRule;
@@ -2147,18 +2475,20 @@ async function aiComposeStyle(){
     const sys='Bạn là chuyên gia viết prompt cho Suno AI (mô hình tạo nhạc). Nhiệm vụ: đọc toàn bộ khai báo của người dùng và viết DUY NHẤT một chuỗi prompt "style" bằng tiếng Anh, các mô tả ngăn cách bằng dấu phẩy, không xuống dòng, không markdown, không giải thích, không tiêu đề. '+
       'Prompt phải: (1) phản ánh ĐẦY ĐỦ và CHÍNH XÁC mọi khai báo (thể loại, cảm xúc, giai điệu, nhịp, giọng, âm sắc, nhạc cụ, ngôn ngữ); (2) tôn trọng TUYỆT ĐỐI cách thể hiện; (3) sắp xếp theo thứ tự ưu tiên: yếu tố quan trọng nhất đứng trước; (4) không mâu thuẫn nội bộ; (5) không nhắc tên ca sĩ/nghệ sĩ có thật; (6) ngắn gọn, súc tích, TỐI ĐA khoảng '+limit+' ký tự. '+
       'QUY TẮC CÁCH THỂ HIỆN: '+deliveryRule+' '+
-      'Về nhạc cụ: coi danh sách nhạc cụ người dùng đưa là bắt buộc phải xuất hiện; có thể thêm rất ít nhạc cụ nền cho hợp thể loại nhưng không lấn át. Chỉ trả về đúng chuỗi prompt style, không gì khác.';
+      'QUY TẮC GIỌNG: nếu có KHÓA CHẤT GIỌNG thì phải giữ nguyên giới tính và các tính từ âm sắc mạnh. Nếu chọn NAM: phải ghi male vocal only và tuyệt đối không đưa female/soprano/alto. Nếu chọn NỮ: phải ghi female vocal only và tuyệt đối không đưa male/tenor/baritone. '+
+      'QUY TẮC NHẠC CỤ: danh sách nhạc cụ người dùng chọn là nguồn sự thật. Nếu KHÓA NHẠC CỤ bật, KHÔNG được tự thêm hoặc thay bằng bất kỳ melodic/lead instrument nào ngoài danh sách; phải loại bỏ cả nhạc cụ vô tình nằm trong mô tả thể loại (ví dụ guitar trong bolero/disco/lambada, piano trong pop ballad) nếu người dùng không chọn. Chỉ có thể thêm percussion hoặc bass nền rất nhẹ khi thật cần. Nếu có SOLO BẮT BUỘC, phải mô tả đúng nhạc cụ đó là lead solo riêng, các nhạc cụ khác lùi nền, không thay bằng guitar. Chỉ trả về đúng chuỗi prompt style, không gì khác.';
     const user='KHAI BÁO CỦA NGƯỜI DÙNG:\n'+decl.join('\n')+'\n\nHãy viết chuỗi prompt style Suno tối ưu (tiếng Anh, phân tách bằng dấu phẩy).';
     let text=await geminiCall(user,sys);
     text=text.trim().replace(/^```[a-z]*\n?/i,'').replace(/```$/,'').replace(/^style\s*[:：]/i,'').replace(/\s*\n\s*/g,' ').trim();
     if(!text){ showNote('err','AI chưa trả được prompt, thử lại lần nữa.'); return; }
     if(text.length>limit+120) text=text.slice(0,limit+120);
-    AI_STYLE=text;
+    AI_STYLE=sanitizeAiStyleForLocks(text);
     const bar=$('aiStyleBar'); if(bar) bar.style.display='flex';
-    // Cập nhật hiển thị mà KHÔNG hủy AI_STYLE
-    const so=$('styleOut'); so.textContent=text; so.classList.remove('empty');
+    // Hiển thị prompt cuối cùng sau khi ép lại các khóa giọng/nhạc cụ/solo.
+    const finalText=effectiveStyle();
+    const so=$('styleOut'); so.textContent=finalText; so.classList.remove('empty');
     const isV4b=$('model').value==='V4'; const styleMax=isV4b?200:1000;
-    const sc=$('styleCnt'); sc.textContent=text.length+' / '+styleMax; sc.classList.toggle('over',text.length>styleMax);
+    const sc=$('styleCnt'); sc.textContent=finalText.length+' / '+styleMax; sc.classList.toggle('over',finalText.length>styleMax);
     showNote('ok','Đã tạo prompt AI tối ưu. Bấm "Tạo nhạc" để dùng. Đổi bất kỳ khai báo nào sẽ quay lại prompt tự động.');
   }catch(e){
     showNote('err', e instanceof TypeError ? 'Không kết nối được Gemini API (CORS/mạng).' : e.message);
@@ -2205,6 +2535,37 @@ function renderAiCuongAm(issues){
       (is.suggestion?' — Gợi ý: '+escapeHtml(is.suggestion):'')+'</span></div></div></div></div>';
   });
   out.innerHTML=html;
+}
+
+let LAST_LYRICS_BEFORE_TONE_FIX='';
+async function aiAutoFixCuongAm(){
+  const raw=$('lyrics').value.trim(), out=$('toneOut'), btn=$('aiAutoFixCuongAm');
+  if(!raw){ out.innerHTML='<p class="hint">Chưa có lời để tự sửa. Viết hoặc dán lời ở mục 05 trước nhé.</p>'; return; }
+  if(!btn)return;
+  const old=btn.textContent; btn.disabled=true; btn.textContent='⏳ Đang sửa cưỡng âm…';
+  try{
+    const sys='Bạn là biên tập viên ca từ tiếng Việt chuyên sửa cưỡng âm để hát tự nhiên. Hãy sửa TỐI THIỂU, chỉ thay những từ/cụm thật sự cần thiết để thanh điệu dễ đặt giai điệu hơn. GIỮ NGUYÊN ý nghĩa, ngôi kể, cảm xúc, vần chính, số dòng và toàn bộ nhãn cấu trúc trong ngoặc vuông như [Verse], [Chorus], [Bridge]. Không tự thêm đoạn mới. Ưu tiên từ thuần Việt tự nhiên, không gượng. Chữ cuối câu nên dễ ngân khi có thể. CHỈ trả về JSON hợp lệ: {"lyrics":"<toàn bộ lời đã sửa>","changes":["mô tả ngắn thay đổi"]}. Không markdown.';
+    const prompt='LỜI GỐC CẦN SỬA CƯỠNG ÂM:\n'+raw+'\n\nHãy trả lại toàn bộ lời sau khi sửa tối thiểu.';
+    const txt=await geminiCall(prompt,sys);
+    const clean=txt.trim().replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+    let data; try{ data=JSON.parse(clean); }catch(e){ throw new Error('Gemini trả về không đúng JSON, thử bấm lại.'); }
+    const revised=String(data.lyrics||'').trim(); if(!revised) throw new Error('AI chưa trả về lời đã sửa.');
+    LAST_LYRICS_BEFORE_TONE_FIX=raw;
+    $('lyrics').value=revised;
+    const undo=$('undoCuongAm'); if(undo) undo.disabled=false;
+    sync(true);
+    analyze();
+    const count=Array.isArray(data.changes)?data.changes.length:0;
+    const note=document.createElement('p'); note.className='hint'; note.style.color='var(--ok)'; note.style.marginBottom='var(--s3)';
+    note.textContent='AI đã sửa cưỡng âm và tự phân tích lại'+(count?' · '+count+' thay đổi':'')+'. Bạn có thể bấm Khôi phục nếu chưa ưng.';
+    out.prepend(note);
+  }catch(e){ out.innerHTML='<p class="hint" style="color:var(--red-d)">'+escapeHtml(e instanceof TypeError?'Không kết nối được Gemini API (CORS/mạng).':e.message)+'</p>'; }
+  finally{ btn.disabled=false; btn.textContent=old; }
+}
+function undoCuongAm(){
+  if(!LAST_LYRICS_BEFORE_TONE_FIX)return;
+  const cur=$('lyrics').value; $('lyrics').value=LAST_LYRICS_BEFORE_TONE_FIX; LAST_LYRICS_BEFORE_TONE_FIX=cur;
+  sync(true); analyze();
 }
 
 /* ---------- Gợi ý ý tưởng ---------- */
@@ -2460,15 +2821,17 @@ function boot(){
 
   try{
     const f=JSON.parse(localStorage.getItem('studio_fields_v2')||'{}');
-    ['title','idea','creativeBrief','creativeLevel','melodyHint','lyrics','bpm','key','duration','space','voiceRef','negTags','model','ratio','placement','dV1','dCh','dBr'].forEach(k=>{ if(f[k]!==undefined && $(k)) $(k).value=f[k]; });
+    ['title','idea','creativeBrief','creativeLevel','melodyHint','lyrics','bpm','key','duration','space','voiceRef','negTags','model','ratio','placement','dV1','dCh','dBr','soloPosition','soloBars','soloMode'].forEach(k=>{ if(f[k]!==undefined && $(k)) $(k).value=f[k]; });
     if(f.solo!==undefined){ fillSolo(); $('solo').value=f.solo; }
     if(f.instrumental!==undefined) $('instrumental').checked=f.instrumental;
     if(f.toneGuard!==undefined) $('toneGuard').checked=f.toneGuard;
     if(f.nativeAcc!==undefined) $('nativeAcc').checked=f.nativeAcc;
+    if(f.strictVoice!==undefined && $('strictVoice')) $('strictVoice').checked=f.strictVoice;
+    if(f.strictArrangement!==undefined && $('strictArrangement')) $('strictArrangement').checked=f.strictArrangement;
   }catch(e){}
 
-  ['title','idea','creativeBrief','creativeLevel','melodyHint','lyrics','bpm','key','duration','space','solo','voiceRef','negTags','model',
-   'styleWeight','weird','ratio','placement','instrumental','toneGuard','nativeAcc','dV1','dCh','dBr']
+  ['title','idea','creativeBrief','creativeLevel','melodyHint','lyrics','bpm','key','duration','space','solo','soloPosition','soloBars','soloMode','voiceRef','negTags','model',
+   'styleWeight','weird','ratio','placement','instrumental','toneGuard','nativeAcc','strictVoice','strictArrangement','dV1','dCh','dBr']
    .forEach(id=>{ const el=$(id); if(el){ const h=()=>sync(true); el.addEventListener('input',h); el.addEventListener('change',h); } });
 
   $('dice').addEventListener('click',()=>{ $('idea').value=pick(TH)+', cảm xúc '+pick(MO)+', bối cảnh '+pick(SE); sync(); });
@@ -2480,9 +2843,19 @@ function boot(){
   $('clearLyr').addEventListener('click',()=>{ if(confirm('Xoá toàn bộ lời đang soạn?')){ $('lyrics').value=''; sync(); $('toneOut').innerHTML=''; $('tScore').textContent='—'; $('tScore').className='score'; } });
   $('analyze').addEventListener('click',analyze);
   if($('aiCheckCuongAm')) $('aiCheckCuongAm').addEventListener('click',aiCheckCuongAm);
+  if($('aiAutoFixCuongAm')) $('aiAutoFixCuongAm').addEventListener('click',aiAutoFixCuongAm);
+  if($('undoCuongAm')) $('undoCuongAm').addEventListener('click',undoCuongAm);
   $('clearAn').addEventListener('click',()=>{ $('toneOut').innerHTML=''; $('tScore').textContent='—'; $('tScore').className='score'; $('tSub').textContent='Bấm “Phân tích lời” để soi thanh điệu từng câu.'; });
   if($('aiStyleBtn')) $('aiStyleBtn').addEventListener('click',aiComposeStyle);
   if($('aiStyleReset')) $('aiStyleReset').addEventListener('click',()=>{ clearAiStyle(); const n=$('aiStyleNote'); if(n) n.style.display='none'; sync(); });
+  if($('strictVoice')) $('strictVoice').addEventListener('change',()=>{
+    if($('strictVoice').checked && !$('instrumental').checked && voiceGender() && S.duet!=='solo'){
+      S.duet='solo';
+      seg('cDuet',DUET.map(d=>[d[0],d[1]]),'duet',refreshDuetVis);
+      refreshDuetVis();
+      sync(true);
+    }
+  });
   $('genBtn').addEventListener('click',generate);
   $('genBtn2').addEventListener('click',generate);
   initMobileComposer();
