@@ -82,7 +82,7 @@
 <!-- /skill:chrome -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TRIẾT MUSIC AI STUDIO · Suno V5.5</title>
+<title>TRIẾT MUSIC AI STUDIO · Suno V6 / V6 Wild</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -575,7 +575,7 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
     <a href="#s6">06 · Cưỡng âm</a>
     <a href="#s7">07 · Bản phối</a>
   </nav>
-  <span class="badge-model" id="modelBadge">SUNO V5.5</span>
+  <span class="badge-model" id="modelBadge">SUNO V6</span>
   <button class="btn quiet sm mv-workspace-btn" id="mvWorkspaceBtn" type="button" title="Mở bàn dựng MV toàn màn hình">🎬 MV STUDIO</button>
   <button class="btn quiet sm settings-top-btn" id="settingsBtn" type="button" title="Cài đặt API và hệ thống">⚙ Cài đặt</button>
   <button class="btn quiet sm" id="resetBtn">Đặt lại</button>
@@ -721,12 +721,9 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
         </select>
       </div>
       <div>
-        <label class="lb">Thời lượng <span class="hint">(chỉ V5.5)</span></label>
-        <select id="duration">
-          <option value="">Tự động</option>
-          <option value="60">1 phút</option><option value="90">1 phút 30</option>
-          <option value="120">2 phút</option><option value="180">3 phút</option><option value="240">4 phút</option>
-        </select>
+        <label class="lb">Thời lượng <span class="hint">(V6 / V6 Wild · 10–360 giây)</span></label>
+        <input type="number" id="duration" min="10" max="360" step="1" inputmode="numeric" placeholder="Tự động">
+        <div class="hint" style="margin-top:6px">Để trống để Kie tự quyết định; có thể nhập trực tiếp từ 10 đến 360 giây.</div>
       </div>
     </div>
   </section>
@@ -776,7 +773,7 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
       </div>
       <div class="block">
         <div class="tgl">
-          <div class="tx"><b>Khóa CỨNG giọng &amp; giới tính</b><small>Bật để khóa nhiều lớp: vocalGender API + Style + thẻ trong lời + Negative Style. Chọn Nam sẽ ép NAM ONLY và loại Nữ; chọn Nữ sẽ làm ngược lại. Khi bật khóa cứng, chế độ song ca sẽ tự về Đơn ca để tránh lẫn giới tính.</small></div>
+          <div class="tx"><b>Khóa CỨNG giọng &amp; giới tính</b><small>Bật để khóa nhiều lớp: vocal_gender API + Style + thẻ trong lời + Negative Style. Chọn Nam sẽ ép NAM ONLY và loại Nữ; chọn Nữ sẽ làm ngược lại. Khi bật khóa cứng, chế độ song ca sẽ tự về Đơn ca để tránh lẫn giới tính.</small></div>
           <label class="sw"><input type="checkbox" id="strictVoice" checked><i></i></label>
         </div>
       </div>
@@ -964,25 +961,63 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
       <input type="text" id="negTags" placeholder="Vd: heavy metal, distorted guitar">
       <div class="hint" id="autoNegPreview" style="margin-top:6px">Negative Style gửi đi (0/180): —</div>
 
-      <div class="rowsp model-rowsp"><b>Mô hình</b></div>
+      <div class="rowsp model-rowsp"><b>Mô hình Suno V6</b></div>
       <select id="model">
-        <option value="V5_5">V5.5 — mới nhất, tự nhiên nhất</option>
-        <option value="V5">V5 — biểu cảm, tạo nhanh</option>
-        <option value="V4_5PLUS">V4.5+ — âm thanh dày</option>
-        <option value="V4_5">V4.5 — bám prompt tốt</option>
-        <option value="V4">V4 — giọng hát ổn định</option>
+        <option value="V6" selected>V6 — chất lượng cao, cân bằng & ổn định</option>
+        <option value="V6_WILD">V6 Wild — sáng tạo mạnh, phá cách hơn</option>
       </select>
+      <div class="hint" id="modelHint" style="margin-top:6px">V6: ưu tiên độ ổn định, chất lượng tổng thể và khả năng bám chỉ dẫn.</div>
 
-      <div class="grid2" style="margin-top:14px">
+      <div class="rowsp" style="margin-top:16px"><b>Tinh chỉnh V6</b></div>
+      <div class="grid2">
         <div>
           <label class="lb">Bám style · <span id="swVal">0.70</span></label>
-          <input type="range" id="styleWeight" min="0" max="1" step="0.05" value="0.7">
+          <input type="range" id="styleWeight" min="0" max="1" step="0.01" value="0.70">
+          <div class="hint" style="margin-top:5px">Cao hơn = bám sát phong cách, phối khí và chỉ dẫn đã khai báo.</div>
         </div>
         <div>
           <label class="lb">Độ phá cách · <span id="wcVal">0.35</span></label>
-          <input type="range" id="weird" min="0" max="1" step="0.05" value="0.35">
+          <input type="range" id="weird" min="0" max="1" step="0.01" value="0.35">
+          <div class="hint" style="margin-top:5px">Cao hơn = thử nghiệm và bất ngờ hơn; V6 Wild thường hợp mức trung bình–cao.</div>
         </div>
       </div>
+
+      <div class="grid2" style="margin-top:14px">
+        <div id="audioWeightZone">
+          <label class="lb">Trọng số âm thanh · <span id="awVal">0.65</span></label>
+          <input type="range" id="audioWeight" min="0" max="1" step="0.01" value="0.65">
+          <div class="hint" style="margin-top:5px">Điều chỉnh ảnh hưởng đặc trưng âm thanh; Kie không dùng tham số này cho bản không lời.</div>
+        </div>
+        <div>
+          <label class="lb">Độ đa dạng kết quả</label>
+          <select id="variety">
+            <option value="0">0 · Bám rất sát style</option>
+            <option value="1" selected>1 · Cân bằng</option>
+            <option value="2">2 · Đa dạng cao</option>
+            <option value="3">3 · Khám phá mạnh</option>
+            <option value="4">4 · Đa dạng tối đa</option>
+          </select>
+        </div>
+      </div>
+
+      <details class="ai-config" style="margin-top:14px">
+        <summary>Persona / Voice ID nâng cao (tuỳ chọn)</summary>
+        <div class="grid2" style="margin-top:12px">
+          <div>
+            <label class="lb">Persona / Voice ID</label>
+            <input type="text" id="personaId" autocomplete="off" spellcheck="false" placeholder="Vd: persona_xxx hoặc voice_xxx">
+          </div>
+          <div>
+            <label class="lb">Loại Persona</label>
+            <select id="personaModel">
+              <option value="">Tự động / không dùng</option>
+              <option value="style_persona">Style Persona</option>
+              <option value="voice_persona">Voice Persona</option>
+            </select>
+          </div>
+        </div>
+        <div class="hint" style="margin-top:7px">Chỉ gửi Persona khi có ID. Nếu không dùng, để trống để không ảnh hưởng quá trình tạo bài.</div>
+      </details>
     </div>
     <div class="kie-credit-card">
       <div class="kie-credit-main"><span><i>⚡</i> Credit Kie.ai còn lại</span><strong id="kieGenCredit">—</strong></div>
@@ -1351,6 +1386,8 @@ function persist(){
       lyrics:$('lyrics').value,bpm:$('bpm').value,key:$('key').value,duration:$('duration').value,space:$('space').value,solo:$('solo').value,
       soloPosition:$('soloPosition')?$('soloPosition').value:'auto',soloBars:$('soloBars')?$('soloBars').value:'8',soloMode:$('soloMode')?$('soloMode').value:'spotlight',
       voiceRef:$('voiceRef').value,negTags:$('negTags').value,model:$('model').value,
+      styleWeight:$('styleWeight').value,weird:$('weird').value,audioWeight:$('audioWeight')?$('audioWeight').value:'0.65',
+      variety:$('variety')?$('variety').value:'1',personaId:$('personaId')?$('personaId').value:'',personaModel:$('personaModel')?$('personaModel').value:'',
       ratio:$('ratio').value,placement:$('placement').value,instrumental:$('instrumental').checked,
       toneGuard:$('toneGuard').checked,nativeAcc:$('nativeAcc').checked,strictVoice:$('strictVoice')?$('strictVoice').checked:true,strictArrangement:$('strictArrangement')?$('strictArrangement').checked:true,
       dV1:$('dV1').value,dCh:$('dCh').value,dBr:$('dBr').value
@@ -1599,11 +1636,10 @@ function criticalStyleLocks(){
   if(v)a.push(v); if(i)a.push(i); if(s)a.push(s); return a;
 }
 
-/* Suno/Kie V5.x: music style API tối đa 1000 ký tự. Giữ biên an toàn để tránh lỗi
-   sau khi ghép khóa giọng/nhạc cụ/solo. V4 có giới hạn thấp hơn. */
-const STYLE_SAFE_MAX_V5=920;
-const STYLE_SAFE_MAX_V4=190;
-function styleSafeMax(){ return $('model') && $('model').value==='V4' ? STYLE_SAFE_MAX_V4 : STYLE_SAFE_MAX_V5; }
+/* Suno V6 / V6 Wild: style API tối đa 1000 ký tự. Giữ biên an toàn 920 ký tự
+   để còn khoảng trống cho các khóa giọng, nhạc cụ và solo được ghép tự động. */
+const STYLE_SAFE_MAX_V6=920;
+function styleSafeMax(){ return STYLE_SAFE_MAX_V6; }
 function compactStyleText(raw,maxLen=styleSafeMax()){
   let text=String(raw||'').replace(/\s+/g,' ').replace(/\s*,\s*/g,', ').replace(/\s*;\s*/g,'; ').trim();
   if(text.length<=maxLen) return text;
@@ -1624,7 +1660,7 @@ function compactStyleText(raw,maxLen=styleSafeMax()){
   }
   return result;
 }
-const NEG_STYLE_MAX=180; // Kie/Suno giới hạn 200 ký tự; chừa biên an toàn.
+const NEG_STYLE_MAX=1000; // Suno V6 / V6 Wild trên Kie.ai hỗ trợ negative_tags tối đa 1000 ký tự.
 function splitNegPhrases(text){
   return String(text||'').split(/[,;]+/).map(x=>x.trim()).filter(Boolean);
 }
@@ -1665,7 +1701,7 @@ function autoNegativeTags(){
   return compactNegativeStyle(autoNegativeParts(),NEG_STYLE_MAX);
 }
 function effectiveNegativeTags(){
-  // Khóa tự động phải đứng trước để không bị nội dung nhập tay chiếm hết giới hạn 180 ký tự.
+  // Khóa tự động đứng trước để ưu tiên các ràng buộc quan trọng khi ghép negative_tags.
   const manual=splitNegPhrases($('negTags').value.trim());
   return compactNegativeStyle([...autoNegativeParts(),...manual],NEG_STYLE_MAX);
 }
@@ -1853,24 +1889,29 @@ function sync(fromUserChange){
   so.textContent=st||'Chưa chọn thiết lập nào.'; so.classList.toggle('empty',!st);
   po.textContent=pr||'Chưa có lời bài hát.'; po.classList.toggle('empty',!pr);
 
-  const isV4=$('model').value==='V4';
-  const styleMax=isV4?STYLE_SAFE_MAX_V4:STYLE_SAFE_MAX_V5, promptMax=isV4?3000:5000;
+  const styleMax=STYLE_SAFE_MAX_V6, promptMax=5000;
   const sc=$('styleCnt'); sc.textContent=st.length+' / '+styleMax+' an toàn'; sc.classList.toggle('over',st.length>styleMax);
   const pc=$('promptCnt'); pc.textContent=pr.length+' / '+promptMax; pc.classList.toggle('over',pr.length>promptMax);
   $('lyrCnt').textContent=pr.length+' / '+promptMax;
 
   $('summary').innerHTML=summary();
   $('mSum').textContent=(S.genre.join(' · ')||'Chưa chọn thể loại')+' · '+($('instrumental').checked?'không lời':S.voice);
-  $('modelBadge').textContent='SUNO '+$('model').value.replace('_','.').replace('V','V');
+  const mv=$('model').value;
+  $('modelBadge').textContent=mv==='V6_WILD'?'SUNO V6 WILD':'SUNO V6';
+  if($('modelHint')) $('modelHint').textContent=mv==='V6_WILD'
+    ?'V6 Wild: ưu tiên khám phá, biến hoá và cách xử lý táo bạo hơn; nên giữ Weirdness/Variety ở mức vừa nếu muốn bài vẫn dễ nghe.'
+    :'V6: ưu tiên độ ổn định, chất lượng tổng thể và khả năng bám chỉ dẫn.';
   const mobileModel=$('modelMobile'); if(mobileModel && mobileModel.value!==$('model').value) mobileModel.value=$('model').value;
   $('vocalZone').classList.toggle('dim',$('instrumental').checked);
   const soloOpts=$('soloOptions'); if(soloOpts) soloOpts.classList.toggle('dim',!$('solo').value);
+  const awz=$('audioWeightZone'); if(awz) awz.classList.toggle('dim',$('instrumental').checked);
+  if($('personaModel')) $('personaModel').disabled=!($('personaId')&&$('personaId').value.trim());
   updateAutoNegPreview();
-  $('duration').disabled=$('model').value!=='V5_5';
   $('bpmVal').textContent=$('bpm').value;
   $('ratioVal').textContent=$('ratio').value;
   $('swVal').textContent=Number($('styleWeight').value).toFixed(2);
   $('wcVal').textContent=Number($('weird').value).toFixed(2);
+  if($('awVal')) $('awVal').textContent=Number($('audioWeight').value).toFixed(2);
   persist();
 }
 
@@ -2051,7 +2092,8 @@ async function post(url,body){
   if(!k) throw new Error('Chưa cấu hình Kie.ai API key. Hãy điền KIE_API_KEY trong phần CẤU HÌNH của file HTML.');
   const r=await fetch(url,{method:'POST',headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(body)});
   let d; try{ d=await r.json(); }catch(e){ throw new Error('Phản hồi không hợp lệ từ Kie.ai (HTTP '+r.status+').'); }
-  if(!r.ok||d.code!==200) throw new Error(kieApiError(r.status,d));
+  const apiOk=(d&&Number(d.code)===200)||(d&&d.success===true)||(d&&String(d.msg||'').toLowerCase()==='success');
+  if(!r.ok||!apiOk) throw new Error(kieApiError(r.status,d));
   return d.data;
 }
 async function get(url){
@@ -2059,7 +2101,8 @@ async function get(url){
   if(!k) throw new Error('Chưa cấu hình Kie.ai API key. Hãy điền KIE_API_KEY trong phần CẤU HÌNH của file HTML.');
   const r=await fetch(url,{headers:{'Authorization':'Bearer '+k,'Accept':'application/json'}});
   let d; try{ d=await r.json(); }catch(e){ throw new Error('Phản hồi không hợp lệ khi kiểm tra trạng thái Kie.ai (HTTP '+r.status+').'); }
-  if(!r.ok||d.code!==200) throw new Error(kieApiError(r.status,d));
+  const apiOk=(d&&Number(d.code)===200)||(d&&d.success===true)||(d&&String(d.msg||'').toLowerCase()==='success');
+  if(!r.ok||!apiOk) throw new Error(kieApiError(r.status,d));
   return d.data;
 }
 
@@ -2190,16 +2233,20 @@ function reuse(id){
 async function generate(){
   const prompt=buildPrompt(), title=$('title').value.trim();
   const instrumental=$('instrumental').checked, model=$('model').value;
-  // Cửa chặn cuối: tuyệt đối không gửi Music Style vượt giới hạn an toàn.
-  const style=compactStyleText(effectiveStyle(),model==='V4'?STYLE_SAFE_MAX_V4:STYLE_SAFE_MAX_V5);
+  if(!['V6','V6_WILD'].includes(model)){
+    $('model').value='V6';
+  }
+  const finalModel=['V6','V6_WILD'].includes(model)?model:'V6';
+  // V6 / V6 Wild: style tối đa 1000 ký tự, lyrics tối đa 5000 ký tự.
+  const style=compactStyleText(effectiveStyle(),STYLE_SAFE_MAX_V6);
   if(!title){ status('bad','Thiếu tiêu đề','Nhập tiêu đề bài hát ở mục 01'); return; }
+  if(title.length>80){ status('bad','Tiêu đề quá dài','Suno V6 cho phép tối đa 80 ký tự.'); return; }
   if(!style){ status('bad','Thiếu style','Chọn ít nhất một thể loại ở mục 01'); return; }
   if(!instrumental && !prompt){ status('bad','Thiếu lời','Viết lời ở mục 05, hoặc bật chế độ không lời'); return; }
-  const apiStyleLimit=model==='V4'?200:1000;
-  if(style.length>apiStyleLimit){ status('bad','Style quá dài','Ứng dụng đã chặn trước khi gửi. Hãy giảm mô tả Style.'); return; }
+  if(style.length>1000){ status('bad','Style quá dài','V6 / V6 Wild cho phép tối đa 1000 ký tự Style.'); return; }
+  if(!instrumental && prompt.length>5000){ status('bad','Lời quá dài','V6 / V6 Wild cho phép tối đa 5000 ký tự Lyrics.'); return; }
 
-  // Khi chọn kiểu ĐỌC/NÓI: đổi MỌI nhãn đoạn hát ([Verse], [Chorus], [Bridge]...)
-  // thành nhãn spoken để Suno đọc thật, không hát. Đây là điểm quyết định.
+  // Khi chọn kiểu ĐỌC/NÓI: đổi nhãn đoạn hát sang nhãn spoken để hạn chế Suno tự hát.
   let prompt2=prompt;
   const spokenPicked=(!instrumental)? S.delivery.filter(l=>SPOKEN_DELIVERY[l]) : [];
   if(spokenPicked.length && prompt2){
@@ -2208,31 +2255,70 @@ async function generate(){
     const hasSing=new RegExp(singTagSrc,'i').test(prompt2);
     if(hasSing){
       prompt2=prompt2.replace(new RegExp(singTagSrc,'gi'),spTag);
-      // gộp các nhãn spoken trùng liền nhau cho gọn
       const esc=spTag.replace(/[[\]]/g,'\\$&');
       prompt2=prompt2.replace(new RegExp('('+esc+')(\\s*\\n\\s*'+esc+')+','g'),spTag);
     }else if(!/\[(spoken|narrat|whisper|đọc|nói)/i.test(prompt2)){
       prompt2=spTag+'\n'+prompt2;
     }
   }
-  const payload={customMode:true,instrumental,model,style,title,callBackUrl:'https://kie.ai/callback-not-used'};
-  if(!instrumental) payload.prompt=prompt2;
-  const neg=effectiveNegativeTags().slice(0,NEG_STYLE_MAX); if(neg) payload.negativeTags=neg;
+
+  // API Kie.ai mới: /api/v1/jobs/createTask + input snake_case.
+  const input={
+    custom_mode:true,
+    instrumental,
+    model:finalModel,
+    style,
+    title
+  };
+  if(!instrumental) input.lyrics=prompt2;
+  const neg=effectiveNegativeTags().slice(0,NEG_STYLE_MAX); if(neg) input.negative_tags=neg;
+
   if(!instrumental && S.duet==='solo'){
     const v=VOICE.find(x=>x.l===S.voice);
-    if(v&&v.g) payload.vocalGender=v.g; // Kie: m=male, f=female
+    if(v&&v.g) input.vocal_gender=v.g; // m / f: tăng xác suất, không phải cam kết tuyệt đối
   }
+
   const sw=parseFloat($('styleWeight').value);
   const hardVoice=!!($('strictVoice')&&$('strictVoice').checked&&!instrumental&&S.duet==='solo'&&voiceGender());
   const hardInstr=!!($('strictArrangement')&&$('strictArrangement').checked&&S.instr.length);
   const strictOn=hardVoice||hardInstr||!!$('solo').value;
-  // Chế độ khóa cứng: đẩy bám style lên tối đa và giảm weirdness gần 0.
-  if(!isNaN(sw)) payload.styleWeight=strictOn?1.00:sw;
-  const wc=parseFloat($('weird').value); if(!isNaN(wc)) payload.weirdnessConstraint=strictOn?0.00:wc;
-  // 'duration' KHONG phai tham so hop le cua /api/v1/generate - da bo de tranh loi API.
+  if(!isNaN(sw)) input.style_weight=Math.max(0,Math.min(1,strictOn?1.00:sw));
+  const wc=parseFloat($('weird').value);
+  if(!isNaN(wc)) input.weirdness_constraint=Math.max(0,Math.min(1,strictOn?0.00:wc));
+
+  // audio_weight chỉ hiệu lực khi có vocal.
+  if(!instrumental && $('audioWeight')){
+    const aw=parseFloat($('audioWeight').value);
+    if(!isNaN(aw)) input.audio_weight=Math.max(0,Math.min(1,aw));
+  }
+  if($('variety')){
+    const vr=parseInt($('variety').value,10);
+    if(Number.isFinite(vr)) input.variety=Math.max(0,Math.min(4,vr));
+  }
+  const personaId=$('personaId')?$('personaId').value.trim():'';
+  const personaModel=$('personaModel')?$('personaModel').value:'';
+  if(personaId){
+    input.persona_id=personaId;
+    if(personaModel) input.persona_model=personaModel;
+  }
+
+  const durRaw=$('duration').value.trim();
+  if(durRaw){
+    const dur=parseInt(durRaw,10);
+    if(!Number.isFinite(dur)||dur<10||dur>360){
+      status('bad','Thời lượng chưa hợp lệ','V6 / V6 Wild cho phép từ 10 đến 360 giây, hoặc để trống để tự động.'); return;
+    }
+    input.duration=dur;
+  }
+
+  const payload={
+    model:'ai-music-api/generate',
+    callBackUrl:'https://kie.ai/callback-not-used',
+    input
+  };
 
   $('genBtn').disabled=true; $('genBtn2').disabled=true;
-  status('run','Đang gửi yêu cầu tới Suno…','');
+  status('run','Đang gửi yêu cầu V6 tới Kie.ai…', finalModel==='V6_WILD'?'V6 Wild':'V6');
   const creditMsg=$('kieCreditMsg'); if(creditMsg) creditMsg.textContent='Đang kiểm tra credit trước khi tạo nhạc…';
   if(window.KieCredit){
     const beforeCredit=await window.KieCredit.refresh();
@@ -2240,50 +2326,141 @@ async function generate(){
     creditTicket=window.KieCredit.mark('Tạo nhạc · '+(title||'không tên'));
   }
   try{
-    const d=await post('https://api.kie.ai/api/v1/generate',payload);
-    const taskId=d.taskId;
+    const d=await post('https://api.kie.ai/api/v1/jobs/createTask',payload);
+    const taskId=d&&d.taskId;
+    if(!taskId) throw new Error('Kie.ai không trả về taskId.');
     status('run','Đã nhận task, đang dựng nhạc…','task '+taskId);
-    watch(taskId);
+    watch(taskId,{title,style,prompt:prompt2,model:finalModel});
   }catch(e){
-    status('bad','Không tạo được nhạc', e instanceof TypeError ? 'Không kết nối được api.kie.ai (có thể do CORS khi mở file trực tiếp).' : e.message);
+    status('bad','Không tạo được nhạc', e instanceof TypeError ? 'Không kết nối được api.kie.ai. Nếu đang mở bằng file://, hãy thử chạy ứng dụng qua http/https.' : e.message);
     $('genBtn').disabled=false; $('genBtn2').disabled=false;
   }
 }
 let creditTicket=null;
-function watch(taskId){
-  if(poll) clearInterval(poll);
-  const t0=Date.now(); let scrolled=false;
-  poll=setInterval(async()=>{
+function normalizeMusicTrack(raw,idx,taskId,fallback={}){
+  if(!raw) return null;
+  if(typeof raw==='string'){
+    if(!/^https?:/i.test(raw)) return null;
+    return {id:taskId+'-'+idx,audioUrl:raw,streamAudioUrl:'',sourceAudioUrl:'',imageUrl:'',title:fallback.title||'Không tên',tags:fallback.style||'',prompt:fallback.prompt||'',duration:0};
+  }
+  const audioUrl=raw.audioUrl||raw.audio_url||raw.url||raw.file_url||'';
+  const streamAudioUrl=raw.streamAudioUrl||raw.stream_audio_url||raw.stream_url||'';
+  const sourceAudioUrl=raw.sourceAudioUrl||raw.source_audio_url||'';
+  const imageUrl=raw.imageUrl||raw.image_url||raw.cover_url||raw.cover||'';
+  if(!audioUrl && !streamAudioUrl && !sourceAudioUrl) return null;
+  return {
+    id:String(raw.id||raw.audio_id||raw.music_id||(taskId+'-'+idx)),
+    audioUrl,streamAudioUrl,sourceAudioUrl,imageUrl,
+    sourceImageUrl:raw.sourceImageUrl||raw.source_image_url||'',
+    sourceStreamAudioUrl:raw.sourceStreamAudioUrl||raw.source_stream_audio_url||'',
+    title:raw.title||fallback.title||'Không tên',
+    tags:raw.tags||raw.style||fallback.style||'',
+    prompt:raw.prompt||raw.lyrics||fallback.prompt||'',
+    duration:Number(raw.duration||raw.audio_duration||0)||0,
+    modelName:raw.modelName||raw.model_name||fallback.model||''
+  };
+}
+function extractMusicTracks(info,taskId,fallback={}){
+  const buckets=[];
+  const add=x=>{ if(Array.isArray(x)) buckets.push(x); };
+  add(info&&info.response&&info.response.sunoData);
+  add(info&&info.sunoData);
+  add(info&&info.data);
+  let rj=info&&info.resultJson;
+  if(typeof rj==='string'){ try{ rj=JSON.parse(rj); }catch(e){ rj=null; } }
+  if(rj){
+    add(rj.sunoData); add(rj.data); add(rj.resultUrls);
+    add(rj.response&&rj.response.sunoData);
+    add(rj.data&&rj.data.data);
+    add(rj.data&&rj.data.sunoData);
+    if(rj.result&&Array.isArray(rj.result)) add(rj.result);
+  }
+  const out=[],seen=new Set();
+  for(const arr of buckets){
+    arr.forEach((x,i)=>{
+      const t=normalizeMusicTrack(x,i,taskId,fallback);
+      if(!t) return;
+      const key=t.id+'|'+(t.audioUrl||t.streamAudioUrl||t.sourceAudioUrl);
+      if(seen.has(key)) return; seen.add(key); out.push(t);
+    });
+  }
+  return out;
+}
+async function getMusicTask(taskId){
+  try{
+    const info=await get('https://api.kie.ai/api/v1/jobs/recordInfo?taskId='+encodeURIComponent(taskId));
+    return {info,source:'jobs'};
+  }catch(primaryError){
+    // Fallback tương thích trong trường hợp tài khoản Kie vẫn trả dữ liệu qua endpoint Suno cũ.
     try{
       const info=await get('https://api.kie.ai/api/v1/generate/record-info?taskId='+encodeURIComponent(taskId));
+      return {info,source:'legacy'};
+    }catch(e){
+      throw primaryError;
+    }
+  }
+}
+function watch(taskId,fallback={}){
+  if(poll) clearInterval(poll);
+  const t0=Date.now(); let scrolled=false,emptySuccessChecks=0;
+  const tick=async()=>{
+    try{
+      const pack=await getMusicTask(taskId), info=pack.info||{};
       const el=Math.round((Date.now()-t0)/1000);
-      const list=(info.response&&info.response.sunoData)||[];
+      let list=extractMusicTracks(info,taskId,fallback);
+      const genericState=String(info.state||'').toLowerCase();
+      const legacyState=String(info.status||'').toUpperCase();
+      const isSuccess=genericState==='success'||legacyState==='SUCCESS';
+      const isFail=genericState==='fail'||['CREATE_TASK_FAILED','GENERATE_AUDIO_FAILED','CALLBACK_EXCEPTION','SENSITIVE_WORD_ERROR'].includes(legacyState);
+
+      // Một số response mới chỉ đưa kết quả nhạc ở endpoint Suno chuyên dụng; thử bổ sung khi task đã success mà chưa thấy track.
+      if(isSuccess && !list.length && pack.source==='jobs'){
+        try{
+          const legacy=await get('https://api.kie.ai/api/v1/generate/record-info?taskId='+encodeURIComponent(taskId));
+          list=extractMusicTracks(legacy,taskId,fallback);
+        }catch(e){}
+      }
       list.forEach(addTrack);
       if(list.length && !scrolled){ scrolled=true; document.getElementById('s7').scrollIntoView({behavior:'smooth',block:'start'}); }
-      if(info.status==='SUCCESS'){
+
+      if(isSuccess){
+        if(!list.length && emptySuccessChecks<2){
+          emptySuccessChecks++;
+          status('run','Nhạc đã hoàn tất, đang lấy file kết quả…','task '+taskId);
+          return;
+        }
         status('off'); clearInterval(poll); poll=null; $('genBtn').disabled=false; $('genBtn2').disabled=false;
+        if(!list.length) status('bad','Task đã hoàn tất nhưng chưa đọc được file nhạc','Hãy bấm tạo lại hoặc mở Cài đặt kiểm tra Kie.ai. Task: '+taskId);
         if(window.KieCredit && creditTicket){
           const tk=creditTicket; creditTicket=null;
           await window.KieCredit.settle(tk);
           const left=window.KieCredit.current(); const cm=$('kieCreditMsg');
           if(cm && left!==null && left!==undefined){ const spent=(tk.before===null||tk.before===undefined)?null:Math.max(0,tk.before-left); cm.textContent='Hoàn tất · còn '+Number(left).toLocaleString('vi-VN',{maximumFractionDigits:2})+(spent===null?'':' · đã dùng '+Number(spent).toLocaleString('vi-VN',{maximumFractionDigits:2})+' credit'); }
         }
+        return;
       }
-      else if(['CREATE_TASK_FAILED','GENERATE_AUDIO_FAILED','CALLBACK_EXCEPTION','SENSITIVE_WORD_ERROR'].includes(info.status)){
-        status('bad','Tạo nhạc thất bại',info.errorMessage||info.status); clearInterval(poll); poll=null;
+      if(isFail){
+        const msg=info.failMsg||info.fail_message||info.errorMessage||info.error_message||info.failCode||legacyState||genericState||'Không rõ nguyên nhân';
+        status('bad','Tạo nhạc thất bại',msg); clearInterval(poll); poll=null;
         if(window.KieCredit) await window.KieCredit.refresh();
         const cm=$('kieCreditMsg'); if(cm) cm.textContent='Tác vụ thất bại · đã làm mới số dư Kie.ai.';
         $('genBtn').disabled=false; $('genBtn2').disabled=false;
-      }else{
-        const lb=info.status==='FIRST_SUCCESS'?'Bản đầu đã xong, đang hoàn thiện bản 2…':
-                 info.status==='TEXT_SUCCESS'?'Đã dựng lời, đang phối nhạc…':'Đang dựng nhạc…';
-        status('run',lb,'task '+taskId+' · '+el+'s');
+        return;
       }
+      const progress=Number(info.progress);
+      let lb='Đang dựng nhạc…';
+      if(legacyState==='FIRST_SUCCESS') lb='Bản đầu đã xong, đang hoàn thiện bản tiếp theo…';
+      else if(legacyState==='TEXT_SUCCESS') lb='Đã dựng lời, đang phối nhạc…';
+      else if(genericState==='waiting'||genericState==='queuing') lb='Đang xếp hàng xử lý…';
+      else if(genericState==='generating') lb='Đang dựng nhạc V6…';
+      status('run',lb,'task '+taskId+' · '+el+'s'+(Number.isFinite(progress)?' · '+progress+'%':''));
     }catch(e){
       status('bad','Mất kết nối khi theo dõi',e.message); clearInterval(poll); poll=null;
       $('genBtn').disabled=false; $('genBtn2').disabled=false;
     }
-  },6000);
+  };
+  tick();
+  poll=setInterval(tick,4500);
 }
 
 /* ==========================================================
@@ -2505,7 +2682,7 @@ async function aiComposeStyle(){
   btn.disabled=true; const old=btn.textContent; btn.textContent='⏳ AI đang viết…';
   showNote('','AI đang đọc mọi khai báo và soạn prompt style tối ưu…');
   try{
-    const isV4=$('model').value==='V4'; const reserve=criticalStyleLocks().join(', ').length; const maxFinal=isV4?STYLE_SAFE_MAX_V4:STYLE_SAFE_MAX_V5; const limit=isV4?Math.max(70,maxFinal-reserve-20):Math.max(260,Math.min(680,maxFinal-reserve-40));
+    const reserve=criticalStyleLocks().join(', ').length; const maxFinal=STYLE_SAFE_MAX_V6; const limit=Math.max(260,Math.min(680,maxFinal-reserve-40));
     const sys='Bạn là chuyên gia viết prompt cho Suno AI (mô hình tạo nhạc). Nhiệm vụ: đọc toàn bộ khai báo của người dùng và viết DUY NHẤT một chuỗi prompt "style" bằng tiếng Anh, các mô tả ngăn cách bằng dấu phẩy, không xuống dòng, không markdown, không giải thích, không tiêu đề. '+
       'Prompt phải: (1) phản ánh ĐẦY ĐỦ và CHÍNH XÁC mọi khai báo (thể loại, cảm xúc, giai điệu, nhịp, giọng, âm sắc, nhạc cụ, ngôn ngữ); (2) tôn trọng TUYỆT ĐỐI cách thể hiện; (3) sắp xếp theo thứ tự ưu tiên: yếu tố quan trọng nhất đứng trước; (4) không mâu thuẫn nội bộ; (5) không nhắc tên ca sĩ/nghệ sĩ có thật; (6) ngắn gọn, súc tích, TỐI ĐA khoảng '+limit+' ký tự. '+
       'QUY TẮC CÁCH THỂ HIỆN: '+deliveryRule+' '+
@@ -2521,7 +2698,7 @@ async function aiComposeStyle(){
     // Hiển thị prompt cuối cùng sau khi ép lại các khóa giọng/nhạc cụ/solo.
     const finalText=effectiveStyle();
     const so=$('styleOut'); so.textContent=finalText; so.classList.remove('empty');
-    const isV4b=$('model').value==='V4'; const styleMax=isV4b?STYLE_SAFE_MAX_V4:STYLE_SAFE_MAX_V5;
+    const styleMax=STYLE_SAFE_MAX_V6;
     const sc=$('styleCnt'); sc.textContent=finalText.length+' / '+styleMax+' an toàn'; sc.classList.toggle('over',finalText.length>styleMax);
     showNote('ok','Đã tạo prompt AI tối ưu. Bấm "Tạo nhạc" để dùng. Đổi bất kỳ khai báo nào sẽ quay lại prompt tự động.');
   }catch(e){
@@ -2811,7 +2988,7 @@ function initMobileComposer(){
   if(desktopModel && mobileModel && !mobileModel.options.length){
     [...desktopModel.options].forEach((opt)=>{
       const o=document.createElement('option'); o.value=opt.value;
-      const shortName=opt.value==='V5_5'?'V5.5':opt.value==='V4_5PLUS'?'V4.5+':opt.value.replace('_','.');
+      const shortName=opt.value==='V6'?'V6':opt.value==='V6_WILD'?'V6 Wild':opt.value.replace(/_/g,'.');
       o.textContent=shortName;
       mobileModel.appendChild(o);
     });
@@ -2855,7 +3032,9 @@ function boot(){
 
   try{
     const f=JSON.parse(localStorage.getItem('studio_fields_v2')||'{}');
-    ['title','idea','creativeBrief','creativeLevel','melodyHint','lyrics','bpm','key','duration','space','voiceRef','negTags','model','ratio','placement','dV1','dCh','dBr','soloPosition','soloBars','soloMode'].forEach(k=>{ if(f[k]!==undefined && $(k)) $(k).value=f[k]; });
+    ['title','idea','creativeBrief','creativeLevel','melodyHint','lyrics','bpm','key','duration','space','voiceRef','negTags','model','styleWeight','weird','audioWeight','variety','personaId','personaModel','ratio','placement','dV1','dCh','dBr','soloPosition','soloBars','soloMode'].forEach(k=>{ if(f[k]!==undefined && $(k)) $(k).value=f[k]; });
+    // Bản này chỉ dùng hai model V6 và V6 Wild; cấu hình cũ (V5.x/V6 Mini...) tự nâng về V6.
+    if($('model') && !['V6','V6_WILD'].includes($('model').value)) $('model').value='V6';
     if(f.solo!==undefined){ fillSolo(); $('solo').value=f.solo; }
     if(f.instrumental!==undefined) $('instrumental').checked=f.instrumental;
     if(f.toneGuard!==undefined) $('toneGuard').checked=f.toneGuard;
@@ -2865,7 +3044,7 @@ function boot(){
   }catch(e){}
 
   ['title','idea','creativeBrief','creativeLevel','melodyHint','lyrics','bpm','key','duration','space','solo','soloPosition','soloBars','soloMode','voiceRef','negTags','model',
-   'styleWeight','weird','ratio','placement','instrumental','toneGuard','nativeAcc','strictVoice','strictArrangement','dV1','dCh','dBr']
+   'styleWeight','weird','audioWeight','variety','personaId','personaModel','ratio','placement','instrumental','toneGuard','nativeAcc','strictVoice','strictArrangement','dV1','dCh','dBr']
    .forEach(id=>{ const el=$(id); if(el){ const h=()=>sync(true); el.addEventListener('input',h); el.addEventListener('change',h); } });
 
   $('dice').addEventListener('click',()=>{ $('idea').value=pick(TH)+', cảm xúc '+pick(MO)+', bối cảnh '+pick(SE); sync(); });
