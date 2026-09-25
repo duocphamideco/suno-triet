@@ -82,7 +82,7 @@
 <!-- /skill:chrome -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TRIẾT MUSIC AI STUDIO · Suno V6 / V6 Wild</title>
+<title>TRIẾT MUSIC AI STUDIO · V6 Pro Composer + GPT Image 2.5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -671,9 +671,9 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
       </div>
       <div>
         <label class="lb">Ý tưởng / chủ đề</label>
-        <div style="display:flex;gap:8px">
-          <input type="text" id="idea" placeholder="Vd: yêu xa, đêm mưa Sài Gòn...">
-          <button class="btn quiet" id="dice" title="Gợi ý ngẫu nhiên" style="flex:none;padding:9px 12px">🎲</button>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:start">
+          <textarea id="idea" maxlength="1800" rows="4" placeholder="Viết rộng ý tưởng bài hát: câu chuyện, nhân vật, bối cảnh, điều muốn nói, câu chữ muốn giữ lại, hình ảnh, đoạn cao trào, đoạn rap/đọc..."></textarea>
+          <button class="btn quiet" id="dice" title="Gợi ý ngẫu nhiên" style="padding:9px 12px">🎲</button>
         </div>
       </div>
     </div>
@@ -684,8 +684,13 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
         <button class="btn solid sm ai-glow" id="aiIdea" type="button">Nâng ý tưởng bằng AI</button>
       </div>
       <div class="cd-grid">
-        <div><label class="lb">Bản mô tả sáng tác</label><textarea id="creativeBrief" maxlength="1200" placeholder="AI sẽ phát triển: nhân vật, hoàn cảnh, xung đột cảm xúc, hình ảnh chủ đạo, cao trào và câu hook. Bạn cũng có thể tự nhập."></textarea></div>
-        <div class="cd-side"><div><label class="lb">Mức sáng tạo</label><select id="creativeLevel"><option value="balanced">Cân bằng · dễ nghe</option><option value="emotional" selected>Giàu cảm xúc · sâu</option><option value="bold">Táo bạo · bất ngờ</option></select></div><div><label class="lb">Chỉ dẫn giai điệu cho Suno</label><textarea id="melodyHint" maxlength="420" placeholder="AI sẽ tạo chỉ dẫn giai điệu bằng tiếng Anh để Suno bám tốt hơn."></textarea></div></div>
+        <div><label class="lb">Bản mô tả sáng tác mở rộng</label><textarea id="creativeBrief" maxlength="2400" rows="8" placeholder="AI sẽ phát triển: nhân vật, hoàn cảnh, xung đột cảm xúc, chi tiết đời sống, hình ảnh chủ đạo, câu hook, diễn biến từng đoạn, cao trào, khoảng lặng và kết thúc. Anh cũng có thể viết rất chi tiết tại đây."></textarea></div>
+        <div class="cd-side">
+          <div><label class="lb">Mức sáng tạo</label><select id="creativeLevel"><option value="balanced">Cân bằng · dễ nghe</option><option value="emotional" selected>Giàu cảm xúc · sâu</option><option value="bold">Táo bạo · bất ngờ</option></select></div>
+          <div><label class="lb">Cấu trúc bài</label><select id="songStructure"><option value="classic" selected>Verse → Pre → Chorus → Verse → Bridge → Final</option><option value="hook_early">Hook sớm · Chorus vào nhanh</option><option value="story">Kể chuyện · cao trào muộn</option><option value="cinematic">Điện ảnh · nhiều chuyển cảnh</option><option value="dance">Dance · hook lặp rõ</option><option value="bolero">Bolero · tự sự mộc, câu dài vừa</option></select></div>
+          <div><label class="lb">Độ chân thực lời ca</label><select id="lyricHumanity"><option value="natural" selected>Tự nhiên · như người thật kể</option><option value="raw">Mộc · đời thường · ít trau chuốt</option><option value="poetic">Điện ảnh · giàu hình ảnh</option><option value="commercial">Đại chúng · hook rõ, dễ nhớ</option></select></div>
+          <div><label class="lb">Chỉ dẫn giai điệu cho Suno</label><textarea id="melodyHint" maxlength="800" rows="5" placeholder="Motif, nhịp câu, điểm nghỉ, cách nâng pre-chorus, cao trào chorus, chuyển bridge, final chorus..."></textarea></div>
+        </div>
       </div>
       <div class="cd-actions"><button class="btn quiet sm" id="emotionPreset" type="button">💗 Tăng chiều sâu cảm xúc</button><button class="btn quiet sm" id="hookPreset" type="button">🎯 Ưu tiên hook dễ nhớ</button><span class="hint" id="ideaNote">Ý tưởng AI sẽ được dùng cả khi viết lời và dựng prompt giai điệu.</span><div class="ai-health" id="aiHealth"><span class="dot"></span><span class="ai-health-text" id="aiHealthText">Gemini · chưa kiểm tra</span><button class="btn quiet sm" id="aiTestBtn" type="button">Kiểm tra AI</button></div></div>
       <div class="ai-settings-link"><span>🔑 Gemini API key được quản lý trong <b>Cài đặt</b> và đồng bộ Firebase cho các máy dùng chung.</span><button class="btn quiet sm" id="openSettingsInline" type="button">Mở Cài đặt</button></div>
@@ -769,7 +774,31 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
 
       <div class="block">
         <label class="lb">Giọng tham chiếu <span class="hint">(tuỳ chọn, mô tả bằng lời)</span></label>
-        <input type="text" id="voiceRef" placeholder="Vd: nam trung ấm, hơi khàn, phong cách ballad thập niên 90">
+        <input type="text" id="voiceRef" placeholder="Vd: nam trung ấm, hơi khàn, gần mic, cảm xúc kìm nén ở verse">
+      </div>
+      <div class="block grid2">
+        <div>
+          <label class="lb">Diễn biến giọng trong bài</label>
+          <select id="vocalJourney">
+            <option value="stable">Ổn định cùng một chất giọng</option>
+            <option value="intimate_power" selected>Verse gần mic → Chorus mở & mạnh</option>
+            <option value="breathy_belt">Verse hơi thở → Chorus belt có kiểm soát</option>
+            <option value="low_high">Verse quãng thấp → Final chorus nâng cao</option>
+            <option value="story_climax">Tự sự → nghẹn nhẹ → vỡ òa cuối bài</option>
+            <option value="contrast_rap">Hát chính mềm → đoạn rap tương phản</option>
+          </select>
+        </div>
+        <div>
+          <label class="lb">Bè / ad-lib cuối bài</label>
+          <select id="backingPlan">
+            <option value="auto">Tự động</option>
+            <option value="none">Không bè</option>
+            <option value="light">Bè nhẹ ở chorus</option>
+            <option value="wide">Bè rộng ở final chorus</option>
+            <option value="callresponse">Bè đối đáp / call-response</option>
+            <option value="adlib">Ad-lib cảm xúc ở outro</option>
+          </select>
+        </div>
       </div>
       <div class="block">
         <div class="tgl">
@@ -813,8 +842,12 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
       <div>
         <label class="lb">Vị trí đoạn solo</label>
         <select id="soloPosition">
-          <option value="auto">Tự động · ưu tiên trước Bridge/Final Chorus</option>
+          <option value="auto">Tự động · chọn điểm chuyển đẹp</option>
+          <option value="before_chorus1">Ngay trước Chorus 1</option>
+          <option value="after_chorus1">Ngay sau Chorus 1</option>
+          <option value="before_chorus2">Ngay trước Chorus 2</option>
           <option value="before_bridge">Trước Bridge</option>
+          <option value="after_bridge">Sau Bridge</option>
           <option value="before_final">Trước Final Chorus</option>
           <option value="before_outro">Trước Outro</option>
           <option value="end">Cuối bài</option>
@@ -838,6 +871,86 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
           <option value="virtuoso">Solo kỹ thuật · cao trào</option>
         </select>
       </div>
+    </div>
+
+    <div class="block" style="border-top:1px solid var(--rule-2);padding-top:18px">
+      <div class="block-lb"><b>Đạo diễn đoạn nhạc &amp; chuyển cảnh</b><span class="meta">acoustic · rap · spoken · dynamic</span></div>
+      <div class="grid3">
+        <div>
+          <label class="lb">Acoustic break</label>
+          <select id="acousticBreak">
+            <option value="none">Không chèn</option>
+            <option value="strip">Rút phối · mộc tối giản</option>
+            <option value="guitar">Acoustic guitar spotlight</option>
+            <option value="piano">Piano acoustic / unplugged</option>
+            <option value="folk">Mộc dân gian theo nhạc cụ đã chọn</option>
+          </select>
+        </div>
+        <div>
+          <label class="lb">Vị trí acoustic</label>
+          <select id="acousticPosition">
+            <option value="before_chorus1">Trước Chorus 1</option>
+            <option value="after_chorus1">Sau Chorus 1</option>
+            <option value="before_bridge" selected>Trước Bridge</option>
+            <option value="after_bridge">Sau Bridge</option>
+            <option value="before_final">Trước Final Chorus</option>
+          </select>
+        </div>
+        <div>
+          <label class="lb">Độ dài acoustic</label>
+          <select id="acousticBars"><option value="4">4 ô nhịp</option><option value="8" selected>8 ô nhịp</option><option value="12">12 ô nhịp</option></select>
+        </div>
+      </div>
+      <div class="grid3" style="margin-top:14px">
+        <div>
+          <label class="lb">Chèn giọng đặc biệt</label>
+          <select id="vocalInsert">
+            <option value="none">Không chèn</option>
+            <option value="rap">Rap</option>
+            <option value="spoken">Đọc / spoken</option>
+            <option value="whisper">Thì thầm</option>
+            <option value="halfspoken">Hát nói / half-spoken</option>
+          </select>
+        </div>
+        <div>
+          <label class="lb">Vị trí chèn</label>
+          <select id="vocalInsertPosition">
+            <option value="before_chorus1">Trước Chorus 1</option>
+            <option value="after_chorus1">Sau Chorus 1</option>
+            <option value="before_bridge" selected>Trước Bridge</option>
+            <option value="bridge">Thay / mở đầu Bridge</option>
+            <option value="before_final">Trước Final Chorus</option>
+            <option value="outro">Trước Outro</option>
+          </select>
+        </div>
+        <div>
+          <label class="lb">Giọng đoạn chèn</label>
+          <select id="vocalInsertVoice">
+            <option value="same">Giữ giọng ca chính</option>
+            <option value="contrast">Giọng tương phản</option>
+            <option value="male">Giọng nam</option>
+            <option value="female">Giọng nữ</option>
+            <option value="low">Giọng trầm gần mic</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:14px">
+        <div>
+          <label class="lb">Độ dài đoạn chèn</label>
+          <select id="vocalInsertBars"><option value="4">4 ô nhịp</option><option value="8" selected>8 ô nhịp</option><option value="12">12 ô nhịp</option><option value="16">16 ô nhịp</option></select>
+        </div>
+        <div>
+          <label class="lb">Động lực toàn bài</label>
+          <select id="dynamicPlan">
+            <option value="natural" selected>Tự nhiên · tăng dần</option>
+            <option value="quiet_big">Verse rất nhỏ → Chorus rất lớn</option>
+            <option value="drop_lift">Drop/rút phối trước chorus → bung mở</option>
+            <option value="waves">Lên xuống theo từng đợt cảm xúc</option>
+            <option value="cinematic">Điện ảnh · build / break / climax</option>
+          </select>
+        </div>
+      </div>
+      <div class="hint" style="margin-top:8px">Các cue này được chèn đúng vị trí trong Lyrics/Prompt để V6 hiểu rõ đoạn solo, acoustic break, rap/đọc và cách chuyển năng lượng giữa các phần.</div>
     </div>
   </section>
 
@@ -1311,6 +1424,10 @@ const VOICE=[
   {l:'Nam Pop trẻ',d:'Hiện đại, sạch, gần mic',t:'youthful modern vietnamese pop male vocal, clean intimate tone',g:'m'},
   {l:'Nam Soul',d:'Dày, soulful, nhiều dynamic',t:'soulful male vocal, rich dynamics, expressive runs and controlled grit',g:'m'},
   {l:'Nam khàn bụi',d:'Khàn, chất bụi bặm',t:'raspy husky male vocal, textured and emotional',g:'m'},
+  {l:'Nam indie thủ thỉ',d:'Mỏng vừa, hơi thở, rất gần mic',t:'intimate breathy indie male vocal, close-mic, fragile and human',g:'m'},
+  {l:'Nam cinematic baritone',d:'Trầm sang, rộng, điện ảnh',t:'cinematic baritone male vocal, deep controlled resonance, dramatic but natural',g:'m'},
+  {l:'Nam R&B mềm',d:'Mượt, linh hoạt, nhiều groove',t:'smooth contemporary r&b male vocal, relaxed groove, tasteful runs',g:'m'},
+  {l:'Nam rap trầm',d:'Rap trầm, rõ chữ, gần mic',t:'low intimate male rap voice, crisp diction, conversational rhythmic flow',g:'m'},
   {l:'Nữ ngọt ngào',d:'Nhẹ, ngọt, gần gũi',t:'sweet soft female vocal',g:'f'},
   {l:'Nữ trong trẻo',d:'Trong, sạch, sáng',t:'clear crystalline female vocal',g:'f'},
   {l:'Nữ trữ tình sâu',d:'Mezzo ấm, giàu cảm xúc',t:'warm emotional mezzo-soprano female vocal, intimate and expressive',g:'f'},
@@ -1322,6 +1439,10 @@ const VOICE=[
   {l:'Nữ cao nội lực',d:'Belt khoẻ, bùng nổ',t:'powerful belting female soprano',g:'f'},
   {l:'Nữ Pop hiện đại',d:'Sáng, gọn, bắt tai',t:'modern polished vietnamese pop female vocal, bright controlled tone',g:'f'},
   {l:'Nữ Soul / R&B',d:'Mềm, quyến rũ, nhiều run',t:'soulful r&b female vocal, smooth runs, intimate dynamics',g:'f'},
+  {l:'Nữ indie hơi thở',d:'Mỏng, gần mic, mong manh',t:'breathy intimate indie female vocal, fragile close-mic tone, natural imperfections',g:'f'},
+  {l:'Nữ mezzo nội lực',d:'Dày, ấm, chorus bùng mạnh',t:'powerful warm mezzo female vocal, rich chest resonance, controlled climactic belt',g:'f'},
+  {l:'Nữ jazz khói',d:'Khói, tối, tinh tế',t:'smoky jazz female vocal, low velvety phrasing, intimate sophisticated timing',g:'f'},
+  {l:'Nữ rap cá tính',d:'Rap rõ chữ, nhịp chắc',t:'confident female rap voice, crisp diction, rhythmic conversational flow',g:'f'},
   {l:'Giọng trung tính',d:'Mềm, hiện đại, không nhấn giới tính',t:'androgynous contemporary vocal, smooth neutral timbre',g:''},
   {l:'Giọng trẻ em',d:'Hồn nhiên, trong',t:'young child voice',g:''},{l:'Giọng thủ thỉ',d:'Hơi thở, sát mic',t:'breathy whisper close-mic vocal',g:''}
 ];
@@ -1382,9 +1503,12 @@ function persist(){
     localStorage.setItem('studio_state_v2',JSON.stringify(S));
     localStorage.setItem('studio_fields_v2',JSON.stringify({
       title:$('title').value,idea:$('idea').value,creativeBrief:$('creativeBrief')?$('creativeBrief').value:'',
-      creativeLevel:$('creativeLevel')?$('creativeLevel').value:'emotional',melodyHint:$('melodyHint')?$('melodyHint').value:'',
+      creativeLevel:$('creativeLevel')?$('creativeLevel').value:'emotional',songStructure:$('songStructure')?$('songStructure').value:'classic',lyricHumanity:$('lyricHumanity')?$('lyricHumanity').value:'natural',melodyHint:$('melodyHint')?$('melodyHint').value:'',
       lyrics:$('lyrics').value,bpm:$('bpm').value,key:$('key').value,duration:$('duration').value,space:$('space').value,solo:$('solo').value,
       soloPosition:$('soloPosition')?$('soloPosition').value:'auto',soloBars:$('soloBars')?$('soloBars').value:'8',soloMode:$('soloMode')?$('soloMode').value:'spotlight',
+      acousticBreak:$('acousticBreak')?$('acousticBreak').value:'none',acousticPosition:$('acousticPosition')?$('acousticPosition').value:'before_bridge',acousticBars:$('acousticBars')?$('acousticBars').value:'8',
+      vocalInsert:$('vocalInsert')?$('vocalInsert').value:'none',vocalInsertPosition:$('vocalInsertPosition')?$('vocalInsertPosition').value:'before_bridge',vocalInsertVoice:$('vocalInsertVoice')?$('vocalInsertVoice').value:'same',vocalInsertBars:$('vocalInsertBars')?$('vocalInsertBars').value:'8',dynamicPlan:$('dynamicPlan')?$('dynamicPlan').value:'natural',
+      vocalJourney:$('vocalJourney')?$('vocalJourney').value:'intimate_power',backingPlan:$('backingPlan')?$('backingPlan').value:'auto',
       voiceRef:$('voiceRef').value,negTags:$('negTags').value,model:$('model').value,
       styleWeight:$('styleWeight').value,weird:$('weird').value,audioWeight:$('audioWeight')?$('audioWeight').value:'0.65',
       variety:$('variety')?$('variety').value:'1',personaId:$('personaId')?$('personaId').value:'',personaModel:$('personaModel')?$('personaModel').value:'',
@@ -1535,6 +1659,10 @@ const VOICE_LOCK={
   'Nam Pop trẻ':{pos:'youthful modern pop male voice, clean close-mic tone, crisp diction throughout',neg:'old smoky baritone, heavy rasp'},
   'Nam Soul':{pos:'rich soulful male vocal, dynamic chest voice, controlled grit and expressive runs throughout',neg:'flat emotionless vocal, childlike clean tone'},
   'Nam khàn bụi':{pos:'distinctly raspy husky grainy mature male vocal throughout, audible natural vocal grit, rough textured edges, never polished clean',neg:'clean pristine male vocal, crystalline clear vocal, bright youthful tenor, smooth glossy pop vocal'},
+  'Nam indie thủ thỉ':{pos:'intimate breathy indie male lead, close-mic fragile human texture, restrained dynamics in verses',neg:'big operatic tenor, polished arena vocal'},
+  'Nam cinematic baritone':{pos:'cinematic mature baritone male lead, deep controlled resonance, wide emotional dynamics',neg:'thin youthful tenor, nasal comic vocal'},
+  'Nam R&B mềm':{pos:'smooth contemporary r&b male lead, relaxed pocket, tasteful restrained runs',neg:'harsh rock rasp, operatic vibrato'},
+  'Nam rap trầm':{pos:'low intimate male rap voice, clear consonants, conversational rhythmic flow',neg:'high sung tenor, melodic belting'},
   'Nữ ngọt ngào':{pos:'sweet soft warm female vocal, intimate gentle tone throughout',neg:'harsh raspy female vocal, aggressive belting'},
   'Nữ trong trẻo':{pos:'clear crystalline bright clean female vocal throughout, pure transparent tone',neg:'husky smoky female vocal, raspy gritty vocal'},
   'Nữ trữ tình sâu':{pos:'warm mature emotional mezzo-soprano, rich intimate mid-low register throughout',neg:'thin childlike soprano, bright youthful pop vocal'},
@@ -1546,6 +1674,10 @@ const VOICE_LOCK={
   'Nữ cao nội lực':{pos:'powerful resonant female soprano with controlled strong belting throughout',neg:'weak breathy vocal, low smoky alto'},
   'Nữ Pop hiện đại':{pos:'modern polished female pop vocal, bright controlled tone and crisp diction throughout',neg:'rough folk vocal, heavy rasp'},
   'Nữ Soul / R&B':{pos:'soulful smooth female r&b vocal, intimate dynamics and controlled runs throughout',neg:'flat straight vocal, harsh rock rasp'},
+  'Nữ indie hơi thở':{pos:'breathy intimate indie female lead, fragile close-mic texture, subtle natural imperfections',neg:'operatic soprano, oversized belting'},
+  'Nữ mezzo nội lực':{pos:'warm powerful mezzo female lead, rich chest resonance, controlled climactic belt',neg:'thin childlike soprano, weak whisper only'},
+  'Nữ jazz khói':{pos:'smoky low jazz female lead, velvety phrasing, sophisticated laid-back timing',neg:'bright bubblegum pop vocal, harsh rock scream'},
+  'Nữ rap cá tính':{pos:'confident female rap voice, crisp diction, tight rhythmic flow, spoken-forward delivery',neg:'operatic soprano, sustained belting'},
   'Giọng trung tính':{pos:'androgynous contemporary vocal, smooth neutral timbre throughout',neg:'strongly gendered operatic vocal'},
   'Giọng trẻ em':{pos:'natural young child voice, innocent light tone throughout',neg:'mature adult baritone, mature adult alto'},
   'Giọng thủ thỉ':{pos:'breathy intimate close-mic whisper-like vocal, soft airy delivery throughout',neg:'loud belting, shouted vocal'}
@@ -1613,9 +1745,16 @@ function voiceLockText(){
   const r=VOICE_LOCK[S.voice];
   const g=hardGenderText();
   const timbre=r ? 'voice timbre: '+r.pos : '';
-  return [g,timbre].filter(Boolean).join('; ');
+  return [g,timbre, vocalInsertCue() ? 'keep lead-vocal identity except the explicitly tagged rap/spoken insert' : ''].filter(Boolean).join('; ');
 }
-function selectedInstrumentTags(){ return S.instr.map(l=>instrDesc(l)).filter(Boolean); }
+function arrangementExceptionLabels(){
+  const mode=$('acousticBreak')?$('acousticBreak').value:'none';
+  if(mode==='guitar') return ['Guitar mộc'];
+  if(mode==='piano') return ['Piano'];
+  return [];
+}
+function allowedInstrumentLabels(){ return [...new Set([...(S.instr||[]),...arrangementExceptionLabels()])]; }
+function selectedInstrumentTags(){ return allowedInstrumentLabels().map(l=>instrDesc(l)).filter(Boolean); }
 function instrumentLockText(){
   if(!($('strictArrangement')&&$('strictArrangement').checked) || !S.instr.length) return '';
   const exact=selectedInstrumentTags();
@@ -1681,13 +1820,16 @@ function autoNegativeParts(){
   // Ưu tiên cao nhất: giới tính đối nghịch.
   if(!$('instrumental').checked && $('strictVoice')&&$('strictVoice').checked && S.duet==='solo'){
     const g=voiceGender();
-    if(g==='m') out.push('female vocal','female singer','female voice','female backing vocals','soprano');
-    else if(g==='f') out.push('male vocal','male singer','male voice','male backing vocals','tenor','baritone');
+    const vi=$('vocalInsert')?$('vocalInsert').value:'none';
+    const vv=$('vocalInsertVoice')?$('vocalInsertVoice').value:'same';
+    const allowContrast=vi!=='none' && (vv==='contrast' || (g==='m'&&vv==='female') || (g==='f'&&vv==='male'));
+    if(g==='m' && !allowContrast) out.push('female vocal','female singer','female voice','female backing vocals','soprano');
+    else if(g==='f' && !allowContrast) out.push('male vocal','male singer','male voice','male backing vocals','tenor','baritone');
   }
 
   // Sau đó mới tới nhạc cụ ngoài lựa chọn. Guitar được ưu tiên loại vì Suno rất hay tự chen guitar.
   if($('strictArrangement')&&$('strictArrangement').checked && S.instr.length){
-    const selected=new Set(S.instr);
+    const selected=new Set(allowedInstrumentLabels());
     const hasAnyGuitar=['Guitar mộc','Guitar điện','Guitar slide','Guitar phím lõm'].some(x=>selected.has(x));
     if(!hasAnyGuitar) out.push('acoustic guitar','electric guitar','guitar lead','plucked guitar');
     if(!selected.has('Piano') && !selected.has('Piano điện')) out.push('piano lead');
@@ -1713,7 +1855,7 @@ function updateAutoNegPreview(){
 
 function forbiddenInstrumentRegexes(){
   if(!($('strictArrangement')&&$('strictArrangement').checked) || !S.instr.length) return [];
-  const selected=new Set(S.instr), rx=[];
+  const selected=new Set(allowedInstrumentLabels()), rx=[];
   const hasAnyGuitar=['Guitar mộc','Guitar điện','Guitar slide','Guitar phím lõm'].some(x=>selected.has(x));
   if(!hasAnyGuitar) rx.push(/\bguitar\b/i,/\bacoustic guitar\b/i,/\belectric guitar\b/i,/\bslide guitar\b/i);
   if(!selected.has('Piano')&&!selected.has('Piano điện')) rx.push(/\bpiano\b/i,/\brhodes\b/i);
@@ -1739,8 +1881,8 @@ function hardPromptCues(){
   const cues=[];
   if(!$('instrumental').checked && $('strictVoice')&&$('strictVoice').checked && S.duet==='solo'){
     const g=voiceGender();
-    if(g==='m') cues.push('[Male Vocal Only: single adult male lead singer throughout]');
-    else if(g==='f') cues.push('[Female Vocal Only: single adult female lead singer throughout]');
+    if(g==='m') cues.push('[Lead Vocal: single adult male lead singer throughout'+(vocalInsertCue()?'; exception only for explicitly tagged rap/spoken insert':'')+']');
+    else if(g==='f') cues.push('[Lead Vocal: single adult female lead singer throughout'+(vocalInsertCue()?'; exception only for explicitly tagged rap/spoken insert':'')+']');
   }
   if($('strictArrangement')&&$('strictArrangement').checked && S.instr.length){
     const xs=selectedInstrumentTags();
@@ -1757,21 +1899,69 @@ function soloCue(){
   const modeText={spotlight:'featured lead, other instruments pull back',callresponse:'featured lead, call and response feel',emotional:'emotional sustained expressive phrasing',virtuoso:'virtuosic climactic solo'}[mode]||'featured lead';
   return '[Instrumental Solo: '+(TAG[s]||s)+', '+bars+' bars, '+modeText+', no vocals]';
 }
-function injectSoloCue(raw){
-  const cue=soloCue(); if(!cue || !raw)return raw;
-  // Nếu lời đã có một nhãn solo thì chuẩn hóa nhãn đó thành cue chính xác đã chọn.
-  if(/^\s*\[[^\]]*solo[^\]]*\]\s*$/im.test(raw)) return raw.replace(/^\s*\[[^\]]*solo[^\]]*\]\s*$/im,cue);
-  const pos=$('soloPosition')?$('soloPosition').value:'auto';
-  const insertBefore=(re)=> re.test(raw) ? raw.replace(re,cue+'\n\n$&') : '';
+function insertCueAt(raw,cue,pos){
+  if(!raw||!cue)return raw;
+  const before=(re)=>re.test(raw)?raw.replace(re,cue+'\n\n$&'):'';
+  const after=(re)=>re.test(raw)?raw.replace(re,'$&\n\n'+cue):'';
   let x='';
-  if(pos==='before_bridge') x=insertBefore(/^\s*\[Bridge[^\]]*\]/im);
-  else if(pos==='before_final') x=insertBefore(/^\s*\[(?:Final\s+Chorus|Chorus\s+Final)[^\]]*\]/im);
-  else if(pos==='before_outro') x=insertBefore(/^\s*\[Outro[^\]]*\]/im);
-  else if(pos==='auto'){
-    x=insertBefore(/^\s*\[Bridge[^\]]*\]/im) || insertBefore(/^\s*\[(?:Final\s+Chorus|Chorus\s+Final)[^\]]*\]/im) || insertBefore(/^\s*\[Outro[^\]]*\]/im);
-  }
+  if(pos==='before_chorus1') x=before(/^\s*\[Chorus(?:\s*1)?[^\]]*\]/im);
+  else if(pos==='after_chorus1') x=after(/^\s*\[Chorus(?:\s*1)?[^\]]*\][\s\S]*?(?=^\s*\[(?:Verse\s*2|Bridge|Pre-Chorus|Chorus\s*2|Final\s+Chorus|Outro)[^\]]*\])/im);
+  else if(pos==='before_chorus2') x=before(/^\s*\[Chorus\s*2[^\]]*\]/im);
+  else if(pos==='before_bridge') x=before(/^\s*\[Bridge[^\]]*\]/im);
+  else if(pos==='bridge') x=before(/^\s*\[Bridge[^\]]*\]/im);
+  else if(pos==='after_bridge') x=after(/^\s*\[Bridge[^\]]*\][\s\S]*?(?=^\s*\[(?:Final\s+Chorus|Chorus\s*Final|Outro)[^\]]*\])/im);
+  else if(pos==='before_final') x=before(/^\s*\[(?:Final\s+Chorus|Chorus\s+Final)[^\]]*\]/im);
+  else if(pos==='before_outro'||pos==='outro') x=before(/^\s*\[Outro[^\]]*\]/im);
   if(x)return x;
   return raw.replace(/\s+$/,'')+'\n\n'+cue;
+}
+function injectSoloCue(raw){
+  const cue=soloCue(); if(!cue || !raw)return raw;
+  if(/^\s*\[[^\]]*solo[^\]]*\]\s*$/im.test(raw)) return raw.replace(/^\s*\[[^\]]*solo[^\]]*\]\s*$/im,cue);
+  let pos=$('soloPosition')?$('soloPosition').value:'auto';
+  if(pos==='auto'){
+    if(/^\s*\[Bridge[^\]]*\]/im.test(raw))pos='before_bridge';
+    else if(/^\s*\[(?:Final\s+Chorus|Chorus\s+Final)[^\]]*\]/im.test(raw))pos='before_final';
+    else pos='before_outro';
+  }
+  if(pos==='end') return raw.replace(/\s+$/,'')+'\n\n'+cue;
+  return insertCueAt(raw,cue,pos);
+}
+function acousticCue(){
+  const mode=$('acousticBreak')?$('acousticBreak').value:'none'; if(mode==='none')return '';
+  const bars=$('acousticBars')?$('acousticBars').value:'8';
+  const tx={strip:'stripped-down acoustic break, reduce drums and layers, intimate room feel',guitar:'acoustic guitar spotlight, unplugged intimate texture',piano:'unplugged piano break, warm natural room tone',folk:'organic acoustic folk break using only the selected instruments'}[mode]||'stripped acoustic break';
+  return '[Acoustic Break: '+bars+' bars, '+tx+', no full-band wall of sound]';
+}
+function vocalInsertCue(){
+  if($('instrumental')&&$('instrumental').checked) return '';
+  const mode=$('vocalInsert')?$('vocalInsert').value:'none'; if(mode==='none')return '';
+  const bars=$('vocalInsertBars')?$('vocalInsertBars').value:'8';
+  const voice=$('vocalInsertVoice')?$('vocalInsertVoice').value:'same';
+  const tx={rap:'Rap Section',spoken:'Spoken Word',whisper:'Whispered Spoken',halfspoken:'Half-Spoken'}[mode]||'Spoken Word';
+  const vx={same:'same lead voice identity',contrast:'contrasting secondary voice',male:'male voice',female:'female voice',low:'low close-mic voice'}[voice]||'same lead voice identity';
+  return '['+tx+': '+bars+' bars, '+vx+', natural conversational phrasing, clear diction]';
+}
+function injectArrangementCues(raw){
+  let x=injectSoloCue(raw);
+  const ac=acousticCue(); if(ac) x=insertCueAt(x,ac,$('acousticPosition')?$('acousticPosition').value:'before_bridge');
+  const vc=vocalInsertCue(); if(vc) x=insertCueAt(x,vc,$('vocalInsertPosition')?$('vocalInsertPosition').value:'before_bridge');
+  return x;
+}
+function arrangementStyleText(){
+  const p=[];
+  const ac=acousticCue(); if(ac)p.push(ac.replace(/^\[|\]$/g,''));
+  const vi=vocalInsertCue(); if(vi)p.push(vi.replace(/^\[|\]$/g,''));
+  const dyn=$('dynamicPlan')?$('dynamicPlan').value:'natural';
+  const dt={natural:'natural dynamic arc, gradual emotional lift',quiet_big:'very intimate restrained verses, dramatically wider louder choruses',drop_lift:'intentional arrangement drop before chorus, then strong full-band lift',waves:'wave-like dynamics with repeated tension and release',cinematic:'cinematic dynamics, deliberate build, break, silence and final climax'}[dyn];
+  if(dt)p.push(dt);
+  const vj=$('vocalJourney')?$('vocalJourney').value:'stable';
+  const vt={stable:'consistent vocal identity throughout',intimate_power:'close-mic intimate verses, more open powerful chorus while preserving the same singer identity',breathy_belt:'breathy restrained verses, controlled belt in choruses',low_high:'lower register verses, gradually higher register toward final chorus',story_climax:'conversational storytelling at first, subtle emotional catch later, cathartic final chorus',contrast_rap:'soft melodic lead with a clearly contrasting rap section'}[vj];
+  if(vt)p.push(vt);
+  const bp=$('backingPlan')?$('backingPlan').value:'auto';
+  const bt={none:'no backing vocals',light:'light backing harmonies only in choruses',wide:'wide layered harmonies in final chorus',callresponse:'backing vocal call-and-response accents',adlib:'tasteful emotional ad-libs in outro and final chorus'}[bp];
+  if(bt)p.push(bt);
+  return p.join(', ');
 }
 
 /* Các nhãn "Cách thể hiện" KHÔNG phải hát -> cần ép Suno bỏ giai điệu giọng.
@@ -1805,6 +1995,7 @@ function buildStyle(){
   if(S.instr.length && !($('strictArrangement')&&$('strictArrangement').checked)) p.push(S.instr.map(l=>TAG[l]).join(', '));
   if($('solo').value && !($('strictArrangement')&&$('strictArrangement').checked)) p.push('featuring '+TAG[$('solo').value]+' solo');
   if($('space').value) p.push($('space').value);
+  const arrText=arrangementStyleText(); if(arrText) p.push(arrText);
 
   if(instrumental){ p.push('instrumental only, no vocals'); }
   else{
@@ -1848,7 +2039,7 @@ function buildStyle(){
   return p.filter(Boolean).join(', ');
 }
 function buildPrompt(){
-  let raw=injectSoloCue($('lyrics').value.trim());
+  let raw=injectArrangementCues($('lyrics').value.trim());
   const cues=hardPromptCues();
   if(cues.length && raw) raw=cues.join('\n')+'\n'+raw;
   return raw;
@@ -1863,7 +2054,9 @@ function summary(){
     parts.push('<b>Thể hiện:</b> '+(S.delivery.join(' · ')||'—'));
   }
   parts.push('<b>Nhạc cụ:</b> '+(S.instr.length?S.instr.join(' · '):'—'));
-  if($('solo')&&$('solo').value) parts.push('<b>Solo:</b> '+$('solo').value+' · '+($('soloBars')?$('soloBars').value:'8')+' ô nhịp');
+  if($('solo')&&$('solo').value) parts.push('<b>Solo:</b> '+$('solo').value+' · '+($('soloBars')?$('soloBars').value:'8')+' ô nhịp · '+($('soloPosition')?$('soloPosition').value:'auto'));
+  if($('acousticBreak')&&$('acousticBreak').value!=='none') parts.push('<b>Acoustic:</b> '+$('acousticBreak').value+' · '+$('acousticBars').value+' ô nhịp');
+  if($('vocalInsert')&&$('vocalInsert').value!=='none') parts.push('<b>Đoạn chèn:</b> '+$('vocalInsert').value+' · '+$('vocalInsertBars').value+' ô nhịp');
   parts.push('<b>Khóa:</b> '+(($('strictVoice')&&$('strictVoice').checked)?'giọng ✓':'giọng —')+' · '+(($('strictArrangement')&&$('strictArrangement').checked)?'nhạc cụ ✓':'nhạc cụ —'));
   parts.push('<b>Ngôn ngữ:</b> '+langInfo().label);
   parts.push('<b>Nhịp:</b> '+$('bpm').value+' BPM'+($('key').value?' · '+$('key').value:''));
@@ -2569,10 +2762,10 @@ async function aiIdeaDirector(){
   if(!seed){ if(note) note.textContent='Hãy nhập một ý tưởng hoặc tiêu đề trước.'; $('idea').focus(); return; }
   btn.disabled=true; const old=btn.textContent; btn.textContent='Đang phát triển ý tưởng…'; if(note) note.textContent='AI đang xây câu chuyện, hook và hướng giai điệu…';
   try{
-    const sys='Bạn là Creative Director âm nhạc Việt Nam cấp cao, hiểu sáng tác đại chúng, Bolero, Rumba, Cha-cha, Cải lương, Dân ca và nhạc hiện đại. Từ một ý tưởng ngắn, hãy phát triển thành concept có chiều sâu nhưng không sáo rỗng. CHỈ trả về một JSON object hợp lệ, không markdown, đúng cấu trúc: {"brief":"mô tả sáng tác bằng tiếng Việt 120-220 từ, gồm nhân vật/bối cảnh/xung đột/cảm xúc/hình ảnh chủ đạo/cao trào/hướng câu hook","melody":"chỉ dẫn giai điệu và bản phối bằng tiếng Anh 35-70 từ để đưa vào Suno; nêu motif, nhịp, độ nâng cao trào, khoảng nghỉ, cách chorus bùng lên; không nhắc tên ca sĩ thật","title":"một tiêu đề Việt ngắn giàu hình ảnh nếu tiêu đề đầu vào còn trống"}. Tôn trọng đặc trưng dòng nhạc đã chọn, tiếng Việt tự nhiên, có chi tiết gợi hình và cảm xúc người thật.';
-    const user='Ý tưởng ban đầu: '+seed+'\nThể loại: '+(S.genre.join(', ')||'tự chọn')+'\nCảm xúc: '+(S.mood.join(', ')||'tự chọn')+'\nĐường nét giai điệu: '+(S.contour.join(', ')||'tự chọn')+'\nMức sáng tạo: '+creativeProfile()+'\nBPM hiện tại: '+$('bpm').value+'; Giọng: '+($('key').value||'tự động')+'.';
-    let text=await geminiCall(user,sys,{json:true,schema:{type:'object',properties:{brief:{type:'string'},melody:{type:'string'},title:{type:'string'}},required:['brief','melody','title']}}); text=text.trim().replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim(); const data=JSON.parse(text);
-    if(data.brief) $('creativeBrief').value=String(data.brief).trim().slice(0,1200); if(data.melody) $('melodyHint').value=String(data.melody).trim().slice(0,420); if(!$('title').value.trim() && data.title) $('title').value=String(data.title).trim().slice(0,80);
+    const sys='Bạn là Creative Director âm nhạc Việt Nam cấp cao, đồng thời hiểu cấu trúc ca khúc, vocal direction và visual direction. Từ ý tưởng người dùng, phát triển thành một bài có đời sống thật: nhân vật cụ thể, bối cảnh cụ thể, vật thể/âm thanh/mùi/ánh sáng có thể hình dung, điều nhân vật muốn nhưng không nói thẳng, một mâu thuẫn cảm xúc, một câu hook có khả năng nhớ, diễn biến Verse→Chorus→Bridge có lý do. Tránh văn mẫu AI và sáo ngữ. CHỈ trả về JSON hợp lệ: {"brief":"mô tả sáng tác bằng tiếng Việt 220-420 từ, có câu chuyện, chi tiết đời sống, hook, diễn biến từng đoạn, khoảng lặng, cao trào và kết","melody":"music-direction prompt bằng tiếng Anh 70-130 từ: motif, groove, instrumentation, dynamic arc, transition, vocal dynamics, solo/acoustic/rap nếu phù hợp; không nhắc nghệ sĩ thật","title":"tiêu đề Việt ngắn giàu hình ảnh","cover":"visual direction bằng tiếng Anh 80-150 từ cho bìa/album ảnh, lấy đúng nhân vật, bối cảnh, màu sắc và biểu tượng của bài hát, cinematic realistic photography, no fake typography unless requested"}. Tôn trọng thể loại, cấu trúc và mức chân thực đã chọn.';
+    const user='Ý tưởng ban đầu: '+seed+'\nThể loại: '+(S.genre.join(', ')||'tự chọn')+'\nCảm xúc: '+(S.mood.join(', ')||'tự chọn')+'\nĐường nét giai điệu: '+(S.contour.join(', ')||'tự chọn')+'\nMức sáng tạo: '+creativeProfile()+'\nCấu trúc: '+($('songStructure')?$('songStructure').value:'classic')+'\nĐộ chân thực lời: '+($('lyricHumanity')?$('lyricHumanity').value:'natural')+'\nĐạo diễn chuyển cảnh: '+arrangementStyleText()+'\nBPM hiện tại: '+$('bpm').value+'; Giọng: '+($('key').value||'tự động')+'.';
+    let text=await geminiCall(user,sys,{json:true,schema:{type:'object',properties:{brief:{type:'string'},melody:{type:'string'},title:{type:'string'},cover:{type:'string'}},required:['brief','melody','title','cover']}}); text=text.trim().replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim(); const data=JSON.parse(text);
+    if(data.brief) $('creativeBrief').value=String(data.brief).trim().slice(0,2400); if(data.melody) $('melodyHint').value=String(data.melody).trim().slice(0,800); if(!$('title').value.trim() && data.title) $('title').value=String(data.title).trim().slice(0,80); try{ if(data.cover) localStorage.setItem('triet_last_cover_idea_v1',String(data.cover).trim().slice(0,1800)); }catch(e){}
     if(note) note.textContent='Đã nâng ý tưởng: AI viết lời sẽ dùng concept này, Suno sẽ nhận thêm chỉ dẫn giai điệu.'; sync();
   }catch(e){ if(note) note.textContent=(e instanceof SyntaxError)?'AI trả dữ liệu chưa đúng định dạng, bấm lại để thử lần nữa.':(e instanceof TypeError?'Không kết nối được Gemini API (có thể do CORS/mạng).':e.message); }
   finally{ btn.disabled=false; btn.textContent=old; }
@@ -2598,20 +2791,23 @@ async function aiLyrics(){
     const spokenModeL=spokenPickedL.length>0;
     const spLabelTag=S.delivery.includes('Thì thầm')?'[Whispered Spoken]':'[Spoken Word]';
     const sectionRule = spokenModeL
-      ? ('QUAN TRỌNG: Đây là bài ĐỌC/NÓI (spoken word), KHÔNG phải hát. Chia đoạn bằng nhãn '+spLabelTag+' ở đầu MỖI đoạn (không dùng [Verse], [Chorus], [Bridge]). Viết như lời tự sự/độc thoại để đọc trên nền nhạc, nhịp câu tự nhiên như nói, không cần vần hát và không cần cấu trúc điệp khúc lặp. ')
-      : 'Luôn chia đoạn bằng [Verse 1], [Pre-Chorus] khi cần, [Chorus], [Verse 2], [Bridge], [Final Chorus], [Outro]. ';
+      ? ('QUAN TRỌNG: Đây là bài ĐỌC/NÓI (spoken word), KHÔNG phải hát. Chia đoạn bằng nhãn '+spLabelTag+' ở đầu MỖI đoạn. Viết như lời tự sự/độc thoại để đọc trên nền nhạc, nhịp câu tự nhiên như nói, không ép vần. ')
+      : 'Dùng nhãn cấu trúc rõ ràng [Verse 1], [Pre-Chorus] khi cần, [Chorus], [Verse 2], [Chorus 2] nếu hợp, [Bridge], [Final Chorus], [Outro]. Có thể chèn cue nhạc cụ/rap/spoken theo yêu cầu, mỗi cue đứng trên dòng riêng. ';
     const sysPrompt='Bạn là nhạc sĩ và lyricist Việt Nam giàu kinh nghiệm, viết ca khúc có cảm xúc người thật chứ không phải văn mẫu AI. '+
-      'Mục tiêu: tạo lời có câu chuyện, hình ảnh cụ thể, cảm giác điện ảnh nhưng đời thường, nhịp chữ dễ hát, và một câu hook khiến người nghe nhớ sau lần đầu. '+
+      'Mục tiêu: tạo lời nghe như một người thật đã sống qua câu chuyện đó. Dùng chi tiết cụ thể thay vì tuyên bố cảm xúc chung chung; ưu tiên động từ, đồ vật, địa điểm, thời gian, cử chỉ, lời nói bỏ dở và khoảng im lặng. Nhịp chữ phải dễ hát, có câu hook khiến người nghe nhớ sau lần đầu. '+
       'Tuyệt đối tránh sáo ngữ lạm dụng như "trái tim tan vỡ", "mãi mãi bên nhau", "giữa dòng đời" nếu không có ngữ cảnh mới. '+
-      'Mỗi Verse phải đưa câu chuyện tiến lên; Pre-Chorus tăng căng thẳng; Chorus cô đọng thông điệp và có 1-2 câu hook lặp có chủ ý; Bridge phải mở một góc nhìn hoặc cú chuyển cảm xúc mới. '+
+      'Mỗi Verse phải đưa câu chuyện tiến lên bằng thông tin MỚI; Pre-Chorus tăng căng thẳng hoặc đổi góc nhìn; Chorus cô đọng điều nhân vật không thể nói ở Verse và có 1-2 câu hook lặp có chủ ý; Bridge phải mở một sự thật mới, ký ức mới hoặc quyết định mới. Final Chorus được phép đổi 1-2 câu để cho thấy nhân vật đã thay đổi. '+
       'Nếu là Vietnamese Bolero/Bolero: lời mộc, tự sự, vần tự nhiên, hình ảnh gần gũi, luyến vừa phải. Nếu là Rumba/Cha-cha: câu chữ có nhịp, dễ nhún, hook rõ, không nhồi quá nhiều âm tiết. Nếu là Disco: hook ngắn, sáng, giàu nhịp và dễ lặp theo dance groove. Nếu là Pop Ballad: verse thân mật, cảm xúc tăng dần và chorus bung mở dễ nhớ. Nếu là Lambada: câu chữ uyển chuyển, lãng mạn, giàu chuyển động, ưu tiên nhịp câu gọn để bám percussion syncopated. '+
       'Nếu là Cải lương: ưu tiên chất tự sự kịch tính, khoảng ngân, ngôn ngữ Nam Bộ vừa phải và tinh tế, không biến thành parody. Nếu là Dân ca: ưu tiên hình ảnh quê hương/đời sống phù hợp chủ đề, từ ngữ giản dị mà đẹp. '+
       sectionRule+
       'Ưu tiên thanh điệu tiếng Việt mượt: tránh cưỡng âm, hạn chế hỏi/ngã/nặng ở chữ cuối câu cần ngân dài, đặt nguyên âm mở ở điểm cao trào khi có thể. Không mô phỏng hay nhắc tên ca sĩ/nhạc sĩ có thật. Chỉ trả về đúng phần lời bài hát có nhãn đoạn, không markdown, không giải thích.';
     const concept=$('creativeBrief') && $('creativeBrief').value.trim() ? $('creativeBrief').value.trim() : seed;
-    const userPrompt='Ý tưởng gốc: '+seed+'\nConcept đã phát triển: '+concept.slice(0,1200)+'\nThể loại: '+(S.genre.join(', ')||'không chỉ định')+'\nCảm xúc/không khí: '+(S.mood?S.mood.join(', '):'không chỉ định')+'\nĐường nét giai điệu: '+(S.contour?S.contour.join(', '):'không chỉ định')+'\nMức sáng tạo: '+creativeProfile()+'\nTempo: '+$('bpm').value+' BPM; key: '+($('key').value||'tự động')+'.\nHãy viết một bài hoàn chỉnh, lời tự nhiên như người Việt viết, cảm xúc tăng dần và có chorus thật đáng nhớ.';
+    const structure=$('songStructure')?$('songStructure').value:'classic';
+    const humanity=$('lyricHumanity')?$('lyricHumanity').value:'natural';
+    const arr=arrangementStyleText();
+    const userPrompt='Ý tưởng gốc: '+seed+'\nConcept đã phát triển: '+concept.slice(0,2400)+'\nThể loại: '+(S.genre.join(', ')||'không chỉ định')+'\nCảm xúc/không khí: '+(S.mood?S.mood.join(', '):'không chỉ định')+'\nĐường nét giai điệu: '+(S.contour?S.contour.join(', '):'không chỉ định')+'\nMức sáng tạo: '+creativeProfile()+'\nCấu trúc mong muốn: '+structure+'\nĐộ chân thực: '+humanity+'\nĐạo diễn chuyển cảnh/giọng: '+(arr||'tự nhiên')+'\nSolo: '+($('solo').value?($('solo').value+', '+$('soloBars').value+' bars, vị trí '+$('soloPosition').value):'không')+'\nAcoustic break: '+($('acousticBreak').value!=='none'?($('acousticBreak').value+', '+$('acousticBars').value+' bars, '+$('acousticPosition').value):'không')+'\nĐoạn rap/đọc: '+($('vocalInsert').value!=='none'?($('vocalInsert').value+', '+$('vocalInsertBars').value+' bars, '+$('vocalInsertPosition').value+', voice '+$('vocalInsertVoice').value):'không')+'\nTempo: '+$('bpm').value+' BPM; key: '+($('key').value||'tự động')+'.\nHãy viết bài hoàn chỉnh. Đừng nhồi vần; đừng để mọi câu đều cùng độ dài; cho phép câu ngắn, câu ngập ngừng và một vài chi tiết rất đời. Nếu có solo/acoustic break thì chèn cue đúng vị trí nhưng KHÔNG viết lời trong cue nhạc cụ. Nếu có rap/spoken thì viết nội dung riêng phù hợp câu chuyện, không phải đoạn rap chung chung.';
     const text=await geminiCall(userPrompt, sysPrompt);
-    $('lyrics').value=text.trim();
+    $('lyrics').value=injectArrangementCues(text.trim());
     if(!$('title').value.trim()){
       const guess=text.split('\n').map(s=>s.trim()).find(s=>s && !/^\[.*\]$/.test(s));
       if(guess) $('title').value=guess.replace(/^["“'*#\s]+|["”'*#\s]+$/g,'').slice(0,60);
@@ -2648,7 +2844,12 @@ async function aiComposeStyle(){
   decl.push('- Nhịp/Tone: '+($('bpm').value||'?')+' BPM'+($('key').value?', key '+$('key').value:''));
   decl.push('- Nhạc cụ / phối khí (BẮT BUỘC bám đúng danh sách này): '+(S.instr.length?S.instr.map(l=>l+' ('+TAG[l]+')').join('; '):'chưa chọn'));
   if($('strictArrangement')&&$('strictArrangement').checked) decl.push('- KHÓA NHẠC CỤ: không được thay nhạc cụ lead đã chọn bằng guitar/piano/sax/synth hoặc lead khác không có trong danh sách.');
-  if($('solo').value) decl.push('- SOLO BẮT BUỘC: '+$('solo').value+' ('+TAG[$('solo').value]+'), '+($('soloBars')?$('soloBars').value:'8')+' ô nhịp, '+($('soloMode')?$('soloMode').value:'spotlight')+', không hát trong đoạn solo.');
+  if($('solo').value) decl.push('- SOLO BẮT BUỘC: '+$('solo').value+' ('+TAG[$('solo').value]+'), '+($('soloBars')?$('soloBars').value:'8')+' ô nhịp, '+($('soloMode')?$('soloMode').value:'spotlight')+', vị trí '+($('soloPosition')?$('soloPosition').value:'auto')+', không hát trong đoạn solo.');
+  if($('acousticBreak')&&$('acousticBreak').value!=='none') decl.push('- ACOUSTIC BREAK: '+$('acousticBreak').value+', '+$('acousticBars').value+' bars, position '+$('acousticPosition').value+'.');
+  if($('vocalInsert')&&$('vocalInsert').value!=='none') decl.push('- VOCAL INSERT: '+$('vocalInsert').value+', '+$('vocalInsertBars').value+' bars, position '+$('vocalInsertPosition').value+', '+$('vocalInsertVoice').value+'.');
+  if($('dynamicPlan')) decl.push('- DYNAMIC PLAN: '+$('dynamicPlan').value+'.');
+  if($('vocalJourney')) decl.push('- VOCAL JOURNEY: '+$('vocalJourney').value+'.');
+  if($('backingPlan')) decl.push('- BACKING/ADLIB: '+$('backingPlan').value+'.');
   if($('space').value) decl.push('- Không gian âm thanh: '+$('space').value);
   if(instrumental){
     decl.push('- CHẾ ĐỘ: BẢN KHÔNG LỜI (instrumental), tuyệt đối KHÔNG có giọng người.');
@@ -2662,8 +2863,10 @@ async function aiComposeStyle(){
     decl.push('- Ngôn ngữ hát: '+li.label+' ('+li.tag+')');
     if($('toneGuard').checked) decl.push('- Yêu cầu: giữ đúng thanh điệu tiếng Việt, không cưỡng âm.');
   }
-  if($('creativeBrief') && $('creativeBrief').value.trim()) decl.push('- Concept/ý tưởng bài: '+$('creativeBrief').value.trim().slice(0,500));
-  if($('melodyHint') && $('melodyHint').value.trim()) decl.push('- Chỉ dẫn giai điệu: '+$('melodyHint').value.trim().slice(0,300));
+  if($('creativeBrief') && $('creativeBrief').value.trim()) decl.push('- Concept/ý tưởng bài: '+$('creativeBrief').value.trim().slice(0,900));
+  if($('songStructure')) decl.push('- Cấu trúc bài: '+$('songStructure').value);
+  if($('lyricHumanity')) decl.push('- Độ chân thực lời: '+$('lyricHumanity').value);
+  if($('melodyHint') && $('melodyHint').value.trim()) decl.push('- Chỉ dẫn giai điệu: '+$('melodyHint').value.trim().slice(0,600));
   decl.push('- Mức sáng tạo: '+creativeProfile());
   const negAll=effectiveNegativeTags();
   if(negAll) decl.push('- Cần tránh / negative tags: '+negAll);
@@ -2687,7 +2890,7 @@ async function aiComposeStyle(){
       'Prompt phải: (1) phản ánh ĐẦY ĐỦ và CHÍNH XÁC mọi khai báo (thể loại, cảm xúc, giai điệu, nhịp, giọng, âm sắc, nhạc cụ, ngôn ngữ); (2) tôn trọng TUYỆT ĐỐI cách thể hiện; (3) sắp xếp theo thứ tự ưu tiên: yếu tố quan trọng nhất đứng trước; (4) không mâu thuẫn nội bộ; (5) không nhắc tên ca sĩ/nghệ sĩ có thật; (6) ngắn gọn, súc tích, TỐI ĐA khoảng '+limit+' ký tự. '+
       'QUY TẮC CÁCH THỂ HIỆN: '+deliveryRule+' '+
       'QUY TẮC GIỌNG: nếu có KHÓA CHẤT GIỌNG thì phải giữ nguyên giới tính và các tính từ âm sắc mạnh. Nếu chọn NAM: phải ghi male vocal only và tuyệt đối không đưa female/soprano/alto. Nếu chọn NỮ: phải ghi female vocal only và tuyệt đối không đưa male/tenor/baritone. '+
-      'QUY TẮC NHẠC CỤ: danh sách nhạc cụ người dùng chọn là nguồn sự thật. Nếu KHÓA NHẠC CỤ bật, KHÔNG được tự thêm hoặc thay bằng bất kỳ melodic/lead instrument nào ngoài danh sách; phải loại bỏ cả nhạc cụ vô tình nằm trong mô tả thể loại (ví dụ guitar trong bolero/disco/lambada, piano trong pop ballad) nếu người dùng không chọn. Chỉ có thể thêm percussion hoặc bass nền rất nhẹ khi thật cần. Nếu có SOLO BẮT BUỘC, phải mô tả đúng nhạc cụ đó là lead solo riêng, các nhạc cụ khác lùi nền, không thay bằng guitar. Chỉ trả về đúng chuỗi prompt style, không gì khác.';
+      'QUY TẮC NHẠC CỤ: danh sách nhạc cụ người dùng chọn là nguồn sự thật. Nếu KHÓA NHẠC CỤ bật, KHÔNG được tự thêm hoặc thay bằng melodic/lead instrument ngoài danh sách. Nếu có SOLO BẮT BUỘC, mô tả đúng nhạc cụ, độ dài và vị trí. Nếu có ACOUSTIC BREAK, RAP/SPOKEN INSERT, DYNAMIC PLAN hoặc VOCAL JOURNEY, phải mô tả như một arrangement timeline rõ ràng thay vì trộn tất cả cùng lúc. Dùng transition tự nhiên: strip-down, pause, pickup, lift, build, drop, re-entry. Chỉ trả về đúng chuỗi prompt style, không gì khác.';
     const user='KHAI BÁO CỦA NGƯỜI DÙNG:\n'+decl.join('\n')+'\n\nHãy viết chuỗi prompt style Suno tối ưu (tiếng Anh, phân tách bằng dấu phẩy).';
     let text=await geminiCall(user,sys);
     text=text.trim().replace(/^```[a-z]*\n?/i,'').replace(/```$/,'').replace(/^style\s*[:：]/i,'').replace(/\s*\n\s*/g,' ').trim();
@@ -3032,7 +3235,7 @@ function boot(){
 
   try{
     const f=JSON.parse(localStorage.getItem('studio_fields_v2')||'{}');
-    ['title','idea','creativeBrief','creativeLevel','melodyHint','lyrics','bpm','key','duration','space','voiceRef','negTags','model','styleWeight','weird','audioWeight','variety','personaId','personaModel','ratio','placement','dV1','dCh','dBr','soloPosition','soloBars','soloMode'].forEach(k=>{ if(f[k]!==undefined && $(k)) $(k).value=f[k]; });
+    ['title','idea','creativeBrief','creativeLevel','songStructure','lyricHumanity','melodyHint','lyrics','bpm','key','duration','space','voiceRef','vocalJourney','backingPlan','negTags','model','styleWeight','weird','audioWeight','variety','personaId','personaModel','ratio','placement','dV1','dCh','dBr','soloPosition','soloBars','soloMode','acousticBreak','acousticPosition','acousticBars','vocalInsert','vocalInsertPosition','vocalInsertVoice','vocalInsertBars','dynamicPlan'].forEach(k=>{ if(f[k]!==undefined && $(k)) $(k).value=f[k]; });
     // Bản này chỉ dùng hai model V6 và V6 Wild; cấu hình cũ (V5.x/V6 Mini...) tự nâng về V6.
     if($('model') && !['V6','V6_WILD'].includes($('model').value)) $('model').value='V6';
     if(f.solo!==undefined){ fillSolo(); $('solo').value=f.solo; }
@@ -3043,7 +3246,7 @@ function boot(){
     if(f.strictArrangement!==undefined && $('strictArrangement')) $('strictArrangement').checked=f.strictArrangement;
   }catch(e){}
 
-  ['title','idea','creativeBrief','creativeLevel','melodyHint','lyrics','bpm','key','duration','space','solo','soloPosition','soloBars','soloMode','voiceRef','negTags','model',
+  ['title','idea','creativeBrief','creativeLevel','songStructure','lyricHumanity','melodyHint','lyrics','bpm','key','duration','space','solo','soloPosition','soloBars','soloMode','acousticBreak','acousticPosition','acousticBars','vocalInsert','vocalInsertPosition','vocalInsertVoice','vocalInsertBars','dynamicPlan','voiceRef','vocalJourney','backingPlan','negTags','model',
    'styleWeight','weird','audioWeight','variety','personaId','personaModel','ratio','placement','instrumental','toneGuard','nativeAcc','strictVoice','strictArrangement','dV1','dCh','dBr']
    .forEach(id=>{ const el=$(id); if(el){ const h=()=>sync(true); el.addEventListener('input',h); el.addEventListener('change',h); } });
 
@@ -3556,8 +3759,8 @@ window.KieCredit = (function(){
 <section id="coverTab">
   <div class="cover-intro">
     <div>
-      <div class="sec-head" style="margin-bottom:12px"><span class="n">08</span><h2>Tạo bìa nhạc</h2></div>
-      <p>Nhập concept, thêm tối đa 3 ảnh tham chiếu và chọn model. Ảnh tham chiếu sẽ được upload lên Kie.ai rồi đưa vào model image-to-image.</p>
+      <div class="sec-head" style="margin-bottom:12px"><span class="n">08</span><h2>Album ảnh &amp; bìa nhạc</h2></div>
+      <p>Tạo bìa hoặc bộ ảnh minh họa trực tiếp từ câu chuyện của bài hát. Có thể lấy tự động tiêu đề, concept, lời ca, cảm xúc và nhân vật làm visual direction; ảnh tham chiếu được giữ nhất quán qua image-to-image.</p>
     </div>
     <div class="cover-credit"><small>Credit Kie.ai</small><b id="coverCredits">—</b></div>
   </div>
@@ -3571,9 +3774,10 @@ window.KieCredit = (function(){
       </div>
 
       <div class="cover-field">
-        <label for="coverPromptInput">Mô tả hình ảnh</label>
-        <textarea id="coverPromptInput">Chân dung điện ảnh trong đêm mưa, ánh đèn đỏ phản chiếu trên mặt đường ướt, cảm giác cô độc nhưng ấm áp, typography tối giản.</textarea>
-        <div class="cover-hint">Prompt được gửi nguyên văn. Nên mô tả bằng tiếng Anh để model bám sát hơn — nút ✦ có sẵn bản dịch mẫu.</div>
+        <label for="coverPromptInput">Mô tả hình ảnh / visual direction</label>
+        <textarea id="coverPromptInput" rows="8">Chân dung điện ảnh trong đêm mưa, ánh đèn đỏ phản chiếu trên mặt đường ướt, cảm giác cô độc nhưng ấm áp, typography tối giản.</textarea>
+        <div class="cover-actions" style="margin-top:8px"><button type="button" id="coverFromSong" class="primary">♫ Lấy ý tưởng từ bài hát</button><button type="button" id="coverAiVisual">✦ AI viết visual prompt</button></div>
+        <div class="cover-hint">Nút “Lấy ý tưởng từ bài hát” dùng tiêu đề + concept + lời + mood hiện tại. “AI viết visual prompt” sẽ chuyển chúng thành prompt hình ảnh điện ảnh, nhất quán hơn.</div>
       </div>
 
       <div class="cover-field">
@@ -3592,13 +3796,29 @@ window.KieCredit = (function(){
         <label>Model tạo ảnh</label>
         <div class="cover-models">
           <button type="button" class="cover-model on" data-key="gpt">
-            <span class="tick"></span><strong>GPT Image 2</strong>
-            <small>Chi tiết tốt, typography ổn định</small><em>gpt-image-2 · input_urls</em>
+            <span class="tick"></span><strong>GPT Image 2.5 Flare</strong>
+            <small>Ưu tiên chất lượng · tự fallback GPT Image 2</small><em>2.5 Flare → GPT Image 2 · input_urls</em>
           </button>
           <button type="button" class="cover-model" data-key="nano">
             <span class="tick"></span><strong>Nano Banana 2 Lite</strong>
             <small>Nhanh, nhẹ, thử concept</small><em>nano-banana-2-lite · image_urls</em>
           </button>
+        </div>
+      </div>
+
+      <div class="cover-field cover-row2">
+        <div>
+          <label for="coverVisualMode">Kiểu bộ ảnh</label>
+          <select id="coverVisualMode">
+            <option value="cover" selected>Bìa nhạc · 1 key visual mạnh</option>
+            <option value="story">Album ảnh · kể chuyện theo cảnh</option>
+            <option value="character">Album ảnh · cùng nhân vật, nhiều khoảnh khắc</option>
+            <option value="lyric">Ảnh minh họa lyric / mood</option>
+          </select>
+        </div>
+        <div>
+          <label for="coverResolution">Độ phân giải GPT Image</label>
+          <select id="coverResolution"><option value="1K">1K · nhanh</option><option value="2K" selected>2K · cân bằng</option><option value="4K">4K · chi tiết cao</option></select>
         </div>
       </div>
 
@@ -3635,9 +3855,9 @@ window.KieCredit = (function(){
         <summary>Cấu hình model nâng cao</summary>
         <div class="in">
           <div class="cover-hint" style="margin:0 0 6px">App tự dò model ID hợp lệ trên Kie.ai theo thứ tự bên dưới và ghi nhớ ID chạy được. Nếu Kie.ai đổi tên model, sửa trực tiếp tại đây (phân tách bằng dấu phẩy).</div>
-          <label>GPT Image 2 — có ảnh tham chiếu (image-to-image)</label>
+          <label>GPT Image 2.5/2 — có ảnh tham chiếu (image-to-image)</label>
           <input id="cfgGptI2i" spellcheck="false">
-          <label>GPT Image 2 — không ảnh (text-to-image)</label>
+          <label>GPT Image 2.5/2 — không ảnh (text-to-image)</label>
           <input id="cfgGptT2i" spellcheck="false">
           <label>Nano Banana 2 Lite — có ảnh tham chiếu</label>
           <input id="cfgNanoI2i" spellcheck="false">
@@ -3704,9 +3924,9 @@ window.KieCredit = (function(){
   /* ---- Model ID CHUẨN của Kie.ai Jobs API (không có tiền tố openai/ google/) ---- */
   const DEFAULTS = {
     gpt: {
-      label:'GPT Image 2', legacy:true,
-      i2i:['gpt-image-2-image-to-image','gpt-image-2','gpt-image-1-image-to-image'],
-      t2i:['gpt-image-2','gpt-image-1']
+      label:'GPT Image 2.5 Flare', legacy:true,
+      i2i:['gpt-image-2-5-flare-image-to-image','gpt-image-2-image-to-image'],
+      t2i:['gpt-image-2-5-flare-text-to-image','gpt-image-2-text-to-image']
     },
     nano:{
       label:'Nano Banana 2 Lite', legacy:false,
@@ -3753,12 +3973,12 @@ window.KieCredit = (function(){
   };
 
   const LS = {
-    cfg :'cover.models.v2',
-    ok  :'cover.resolved.v2',
+    cfg :'cover.models.v3',
+    ok  :'cover.resolved.v3',
     gal :'cover.gallery.v1'
   };
   /* Xoá cache model ID sai của bản cũ */
-  try{ localStorage.removeItem('cover.models.v1'); localStorage.removeItem('cover.resolved.v1'); }catch(e){}
+  try{ ['cover.models.v1','cover.resolved.v1','cover.models.v2','cover.resolved.v2'].forEach(k=>localStorage.removeItem(k)); }catch(e){}
   const readJSON = (k,f)=>{ try{ return JSON.parse(localStorage.getItem(k)) || f; }catch(e){ return f; } };
   const writeJSON = (k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} };
 
@@ -3921,6 +4141,10 @@ window.KieCredit = (function(){
       let jumpModel = false;
       for(const pname of params){
         const input = { prompt: prompt, aspect_ratio: ratio };
+        if(key==='gpt' && /gpt-image-2-5-/.test(model)){
+          input.resolution=(q('#coverResolution')&&q('#coverResolution').value)||'2K';
+          input.background='opaque';
+        }
         if(n > 1) input.num_images = n;
         if(imgs.length) input[pname] = imgs;
 
@@ -3940,7 +4164,7 @@ window.KieCredit = (function(){
             const msg = e.message || '', low = msg.toLowerCase();
 
             // Thừa tham số phụ -> gỡ ra thử lại
-            const opt = ['num_images','output_format'].find(p => low.includes(p) && input[p] !== undefined);
+            const opt = ['num_images','output_format','resolution','background'].find(p => low.includes(p) && input[p] !== undefined);
             if(opt){ log('Bỏ tham số "'+opt+'" · '+msg); delete input[opt]; continue; }
 
             // Tỉ lệ không hợp lệ -> hạ về auto
@@ -4075,6 +4299,9 @@ window.KieCredit = (function(){
     const n      = Number(q('#coverCount').value)||1;
     const sameCharacter = !!q('#coverSameCharacter')?.checked;
     let finalPrompt = prompt;
+    const visualMode=(q('#coverVisualMode')&&q('#coverVisualMode').value)||'cover';
+    const modeRule={cover:'Create a premium music cover key visual with one clear focal subject and strong negative space. No collage.',story:'Create a cinematic photo-series frame that advances the song story; each output should depict a different narrative moment while preserving the same visual world.',character:'Create an editorial music photo-series centered on the same main character identity across outputs, with different emotionally meaningful moments.',lyric:'Create a poetic visual interpretation of one lyric/mood, realistic and emotionally specific, avoiding generic stock imagery.'}[visualMode]||'';
+    if(modeRule) finalPrompt += '\n\n'+modeRule;
     if(n>1 && sameCharacter){
       finalPrompt += '\n\nCreate '+n+' distinct cover images featuring the SAME main character consistently across all outputs. Keep the same identity, face, hair, age, outfit and core visual styling, but vary pose, crop, camera angle, background detail, and composition so each image is different.';
     }
@@ -4115,7 +4342,7 @@ window.KieCredit = (function(){
       // 2. TẠO NHIỀU ẢNH = NHIỀU TASK RIÊNG (mỗi task đúng 1 ảnh).
       // Không gửi num_images=n nữa vì một số model có thể hiểu thành 1 ảnh collage nhiều ô.
       let ticket=null;
-      if(window.KieCredit){ await window.KieCredit.refresh(); ticket=window.KieCredit.mark('Tạo '+n+' ảnh bìa riêng · '+(key==='gpt'?'GPT Image 2':'Nano Banana')); }
+      if(window.KieCredit){ await window.KieCredit.refresh(); ticket=window.KieCredit.mark('Tạo '+n+' ảnh bìa/album · '+(key==='gpt'?'GPT Image 2.5':'Nano Banana')); }
       async function oneImageJob(pmt,jobMode,jobRefs,index){
         let job;
         try{ job=await createJob(key,jobMode,pmt,jobRefs,ratioSend,1); }
@@ -4203,6 +4430,38 @@ window.KieCredit = (function(){
     'Portrait in neon rain, red reflections on wet asphalt, shallow depth of field, lonely but warm, 35mm cinematic still.'
   ];
 
+  function songVisualSeed(){
+    const title=(document.getElementById('title')&&document.getElementById('title').value.trim())||q('#coverTitleInput').value.trim();
+    const idea=(document.getElementById('idea')&&document.getElementById('idea').value.trim())||'';
+    const brief=(document.getElementById('creativeBrief')&&document.getElementById('creativeBrief').value.trim())||'';
+    const lyrics=(document.getElementById('lyrics')&&document.getElementById('lyrics').value.trim())||'';
+    let saved=''; try{ saved=localStorage.getItem('triet_last_cover_idea_v1')||''; }catch(e){}
+    const genre=(typeof S!=='undefined'&&S.genre?S.genre.join(', '):'');
+    const mood=(typeof S!=='undefined'&&S.mood?S.mood.join(', '):'');
+    return {title,idea,brief,lyrics:lyrics.slice(0,1800),saved,genre,mood};
+  }
+  function localSongVisualPrompt(){
+    const x=songVisualSeed();
+    const core=x.saved||x.brief||x.idea||x.lyrics||'an emotionally specific Vietnamese song story';
+    return 'Cinematic realistic music artwork inspired directly by this song: '+core.slice(0,1400)+'. Genre: '+(x.genre||'Vietnamese contemporary music')+'. Mood: '+(x.mood||'emotionally nuanced')+'. Use one specific human moment, believable Vietnamese setting when relevant, natural skin and body language, meaningful props and environmental details from the story, cinematic lighting, photographic depth, coherent color palette, subtle film grain, premium album artwork composition, emotionally truthful, no generic stock-photo smile, no random text, no collage.';
+  }
+  async function coverFromSong(useAI){
+    const x=songVisualSeed();
+    if(x.title){ q('#coverTitleInput').value=x.title; syncTitle(); }
+    if(!useAI || typeof geminiCall!=='function'){ q('#coverPromptInput').value=localSongVisualPrompt(); say('✓ Đã lấy ý tưởng trực tiếp từ bài hát.'); return; }
+    const btn=q('#coverAiVisual'); const old=btn?btn.textContent:''; if(btn){btn.disabled=true;btn.textContent='Đang viết…';}
+    say('AI đang chuyển câu chuyện bài hát thành visual direction…');
+    try{
+      const sys='Bạn là art director cho bìa nhạc và album ảnh. Hãy chuyển nội dung ca khúc thành DUY NHẤT một prompt tiếng Anh 120-220 từ cho mô hình tạo ảnh. Prompt phải bám chặt nhân vật, bối cảnh, vật thể biểu tượng, thời gian, thời tiết, ánh sáng và mâu thuẫn cảm xúc trong bài; hình ảnh chân thực như ảnh chụp điện ảnh, không stock-photo, không sáo rỗng. Nếu tạo series, nêu visual continuity để giữ cùng nhân vật/thế giới. Không giải thích, không markdown, không đặt chữ giả lên ảnh trừ khi người dùng yêu cầu.';
+      const user='TITLE: '+(x.title||'Untitled')+'\nGENRE: '+x.genre+'\nMOOD: '+x.mood+'\nIDEA: '+x.idea.slice(0,1200)+'\nCREATIVE BRIEF: '+x.brief.slice(0,2200)+'\nLYRICS EXCERPT: '+x.lyrics+'\nSAVED VISUAL DIRECTION: '+x.saved.slice(0,1200)+'\nVISUAL MODE: '+((q('#coverVisualMode')&&q('#coverVisualMode').value)||'cover');
+      let text=await geminiCall(user,sys); text=text.trim().replace(/^```[a-z]*\n?/i,'').replace(/```$/,'').trim();
+      if(!text)throw new Error('AI chưa trả visual prompt.');
+      q('#coverPromptInput').value=text.slice(0,2600);
+      say('✓ Visual prompt đã bám theo câu chuyện và lời bài hát.');
+    }catch(e){ q('#coverPromptInput').value=localSongVisualPrompt(); say('AI visual chưa chạy, đã dùng prompt tự động từ bài hát: '+(e.message||e),'err'); }
+    finally{ if(btn){btn.disabled=false;btn.textContent=old;} }
+  }
+
   /* ---------- Bind ---------- */
   function syncTitle(){
     const v = q('#coverTitleInput').value.trim() || 'Mùa mưa không tên';
@@ -4217,10 +4476,13 @@ window.KieCredit = (function(){
   }
   q('#coverRatio').addEventListener('change', e=> syncCoverRatioUI(e.target.value));
   syncCoverRatioUI();
+  try{ const st=document.getElementById('title'); if(st&&st.value.trim()&&q('#coverTitleInput').value==='Mùa mưa không tên'){q('#coverTitleInput').value=st.value.trim();syncTitle();} }catch(e){}
   q('#coverSuggest').onclick = ()=>{
     q('#coverPromptInput').value = IDEAS[Math.floor(Math.random()*IDEAS.length)];
     say('Đã nạp một hướng hình ảnh mới');
   };
+  if(q('#coverFromSong')) q('#coverFromSong').onclick=()=>coverFromSong(false);
+  if(q('#coverAiVisual')) q('#coverAiVisual').onclick=()=>coverFromSong(true);
   qa('.cover-model').forEach(b=> b.onclick = ()=>{
     qa('.cover-model').forEach(x=>x.classList.remove('on')); b.classList.add('on');
   });
