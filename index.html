@@ -2519,7 +2519,24 @@ async function generate(){
     creditTicket=window.KieCredit.mark('Tạo nhạc · '+(title||'không tên'));
   }
   try{
-    const d=await post('https://api.kie.ai/api/v1/jobs/createTask',payload);
+    let d;
+    try{
+      d=await post('https://api.kie.ai/api/v1/jobs/createTask',payload);
+    }catch(firstErr){
+      // Persona là tuỳ chọn. Nếu ID đã bị xoá/hết hiệu lực trên Suno/Kie,
+      // tự bỏ Persona và gửi lại một lần để không chặn toàn bộ thao tác Tạo nhạc.
+      const msg=String(firstErr&&firstErr.message||firstErr||'');
+      const personaMissing=!!personaId && /persona/i.test(msg) && /(not\s*found|does\s*not\s*exist|doesn['’]?t\s*exist|không\s*tồn\s*tại|invalid|unknown)/i.test(msg);
+      if(!personaMissing) throw firstErr;
+
+      delete input.persona_id;
+      delete input.persona_model;
+      if($('personaId')) $('personaId').value='';
+      if($('personaModel')) $('personaModel').value='';
+      try{ persist(); }catch(_e){}
+      status('run','Persona cũ không còn tồn tại','Đã tự bỏ Persona và đang tạo nhạc lại bằng giọng/cấu hình hiện tại…');
+      d=await post('https://api.kie.ai/api/v1/jobs/createTask',payload);
+    }
     const taskId=d&&d.taskId;
     if(!taskId) throw new Error('Kie.ai không trả về taskId.');
     status('run','Đã nhận task, đang dựng nhạc…','task '+taskId);
