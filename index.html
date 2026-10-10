@@ -673,6 +673,7 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
     <div class="speech-voice-lock" style="margin-top:14px;padding:13px;border:1px solid #cbd5e1;border-radius:12px;background:#fff">
       <label style="display:flex;gap:8px;align-items:center;font-weight:700"><input type="checkbox" id="speechVoiceLock" checked style="width:18px;height:18px"> Ưu tiên giữ chất giọng đã chọn</label>
       <div class="hint" style="margin:7px 0">Giọng trong danh sách là mô tả để Suno định hướng. Để tái sử dụng một giọng cụ thể giữa nhiều bản, nhập Voice Persona ID của Kie.ai (nếu có). Suno không bảo đảm khóa tuyệt đối khi chỉ dùng prompt.</div>
+      <label style="display:flex;gap:8px;align-items:center;font-weight:650;margin:8px 0"><input type="checkbox" id="speechUsePersona" style="width:18px;height:18px"> Dùng Voice Persona ID nâng cao (chỉ bật nếu có ID hợp lệ)</label>
       <label class="lb" for="speechPersonaId">Voice Persona ID cho giọng này (tùy chọn)</label>
       <input id="speechPersonaId" type="text" autocomplete="off" spellcheck="false" placeholder="Dán Persona ID để giữ cùng một chất giọng">
       <div class="hint" id="speechVoiceInfo" style="margin-top:7px"></div>
@@ -2518,7 +2519,7 @@ async function generate(){
   }
   const personaId=$('personaId')?$('personaId').value.trim():'';
   const personaModel=$('personaModel')?$('personaModel').value:'';
-  const speechPersonaId=speechOn&&$('speechVoiceLock')?.checked ? ($('speechPersonaId')?.value||'').trim() : '';
+  const speechPersonaId=speechOn&&$('speechUsePersona')?.checked ? ($('speechPersonaId')?.value||'').trim() : '';
   const usedPersonaId=speechPersonaId||(!speechOn?personaId:'');
   if(usedPersonaId){
     input.persona_id=usedPersonaId;
@@ -2562,14 +2563,20 @@ async function generate(){
       delete input.persona_id;
       delete input.persona_model;
       if(speechPersonaId){
-        status('bad','Voice Persona không hợp lệ','Kiểm tra lại Voice Persona ID. Không tự thay bằng một giọng khác khi đang khóa giọng.');
-        throw firstErr;
-      }
+        // ID lỗi không được chặn tính năng Speech. Chuyển về định hướng giọng bằng mô tả.
+        if($('speechUsePersona')) $('speechUsePersona').checked=false;
+        if($('speechPersonaId')) $('speechPersonaId').value='';
+        try { window.speechClearInvalidPersona?.(); } catch(_e){}
+        status('run','Persona ID không hợp lệ','Đã bỏ ID lỗi, đang thử tạo Speech bằng kiểu giọng đã chọn (không khóa định danh giọng).');
+        d=await post('https://api.kie.ai/api/v1/jobs/createTask',payload);
+        if(window.speechPersonaWarning) window.speechPersonaWarning();
+      } else {
       if($('personaId')) $('personaId').value='';
       if($('personaModel')) $('personaModel').value='';
       try{ persist(); }catch(_e){}
       status('run','Persona cũ không còn tồn tại','Đã tự bỏ Persona và đang tạo nhạc lại bằng giọng/cấu hình hiện tại…');
       d=await post('https://api.kie.ai/api/v1/jobs/createTask',payload);
+      }
     }
     const taskId=d&&d.taskId;
     if(!taskId) throw new Error('Kie.ai không trả về taskId.');
@@ -5470,13 +5477,15 @@ body.mvx-workspace #mvTab{inset:0!important;z-index:120;height:var(--mvx-vh,100d
  const emotions={intimate:'intimate empathetic conversational storytelling',moving:'deeply moving heartfelt delivery',uplifting:'warm encouraging hopeful narration',reflective:'reflective contemplative storytelling',calm:'peaceful restful comforting narration'};
  const key='triet_speech_voice_v2';let data={};try{data=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(_e){}
  function save(){try{localStorage.setItem(key,JSON.stringify(data))}catch(_e){}}
+ window.speechClearInvalidPersona=function(){const v=$('speechVoice')?.value||'warm';if(data.personas) delete data.personas[v];data.usePersona=false;save();};
+ window.speechPersonaWarning=function(){const el=$('speechHelp');if(el)el.textContent='⚠ Persona ID cũ không hợp lệ nên đã được bỏ. Yêu cầu tạo đã thử lại theo kiểu giọng đang chọn. Muốn khóa đúng một danh tính giọng, cần ID hợp lệ thuộc tài khoản Kie.ai.';};
  function render(){const v=$('speechVoice')?.value||'warm',cfg=P[v]||P.warm; if($('speechPersonaId'))$('speechPersonaId').value=data.personas?.[v]||''; if($('speechVoiceInfo'))$('speechVoiceInfo').textContent=(cfg.gender==='f'?'Đang chọn giọng NỮ':'Đang chọn giọng NAM')+' · '+($('speechPersonaId')?.value?'Có Voice Persona ID được lưu cho kiểu giọng này.':'Chưa có Voice Persona ID: chỉ có thể ưu tiên bằng mô tả, không khóa danh tính giọng chính xác.');}
  window.speechBuildStyle=function(){const v=$('speechVoice').value,voice=P[v]||P.warm,lock=$('speechVoiceLock')?.checked;const t=[lock?'VOICE IDENTITY PRIORITY: exactly ONE speaker from beginning to end, NO voice swaps, NO duets, NO pitch/gender changes':null,voice.desc,musics[$('speechMusic').value],emotions[$('speechEmotion').value],'spoken word only, natural spoken Vietnamese, not sung, accurate Vietnamese tones, expressive pauses, quiet instrumental music under foreground narration, no chorus, no rap, no singing'];if($('speechPauses').value==='long')t.push('long meaningful pauses');if($('speechPauses').value==='short')t.push('short flowing natural pauses');return t.filter(Boolean).join(', ').slice(0,1000)};
  window.speechBuildLyrics=function(raw){raw=String(raw||'').trim();if(!raw)return '';raw=raw.replace(/\[(Verse|Chorus|Bridge|Hook|Pre-Chorus|Outro|Intro)[^\]]*\]/gi,'[Spoken Word]');const v=P[$('speechVoice')?.value]||P.warm,sex=v.gender==='f'?'female':'male';const cue='[Spoken Word: ONE '+sex+' speaking narrator throughout, spoken not sung]';if(/^\[(spoken|narrat|whisper)/i.test(raw))return raw.replace(/^\[[^\]]+\]/,cue);return cue+'\n'+raw};
  function syncSpeech(){const on=$('speechEnabled').checked;$('speechStudio').classList.toggle('speech-active',on);if(on){$('instrumental').checked=false;$('speechHelp').textContent='Speech đang bật: chọn giọng NAM/NỮ, tùy chọn Persona ID để giữ chất giọng qua các lần tạo, sau đó tạo lời nói có nhạc. Suno vẫn có thể không tuân thủ hoàn toàn.';}render()}
  function prepare(){$('speechEnabled').checked=true;syncSpeech();$('instrumental').checked=false;const t=$('lyrics');if(t.value.trim()){t.value=window.speechBuildLyrics(t.value);t.dispatchEvent(new Event('input',{bubbles:true}))}t.scrollIntoView({behavior:'smooth',block:'center'});t.focus()}
  function start(){$('speechEnabled').checked=true;syncSpeech();if(!$('lyrics').value.trim()){prepare();alert('Anh nhập nội dung bài nói vào ô Lời trước khi tạo nhé.');return}if(!$('title').value.trim())$('title').value='Bài nói truyền cảm';$('genBtn').click()}
- document.addEventListener('DOMContentLoaded',()=>{if(data.voice&&P[data.voice])$('speechVoice').value=data.voice;if(typeof data.lock==='boolean')$('speechVoiceLock').checked=data.lock;['speechVoice','speechVoiceLock'].forEach(id=>$(id)?.addEventListener('change',()=>{data.voice=$('speechVoice').value;data.lock=$('speechVoiceLock').checked;save();render()}));$('speechPersonaId')?.addEventListener('input',()=>{const v=$('speechVoice').value;data.personas=data.personas||{};data.personas[v]=$('speechPersonaId').value.trim();save();renderPersonaHint()});function renderPersonaHint(){const v=$('speechVoice').value,c=P[v]||P.warm;$('speechVoiceInfo').textContent=(c.gender==='f'?'Đang chọn giọng NỮ':'Đang chọn giọng NAM')+' · '+($('speechPersonaId').value.trim()?'Sẽ dùng Voice Persona ID đã nhập để yêu cầu cùng chất giọng.':'Chưa có Voice Persona ID: Suno chỉ nhận mô tả chất giọng.')};$('speechEnabled')?.addEventListener('change',syncSpeech);$('speechPrepare')?.addEventListener('click',prepare);$('speechGo')?.addEventListener('click',start);render()});
+ document.addEventListener('DOMContentLoaded',()=>{if(data.voice&&P[data.voice])$('speechVoice').value=data.voice;if($('speechUsePersona'))$('speechUsePersona').checked=false;if(typeof data.lock==='boolean')$('speechVoiceLock').checked=data.lock;['speechVoice','speechVoiceLock'].forEach(id=>$(id)?.addEventListener('change',()=>{data.voice=$('speechVoice').value;data.lock=$('speechVoiceLock').checked;save();render()}));$('speechUsePersona')?.addEventListener('change',()=>{data.usePersona=$('speechUsePersona').checked;save()});$('speechPersonaId')?.addEventListener('input',()=>{const v=$('speechVoice').value;data.personas=data.personas||{};data.personas[v]=$('speechPersonaId').value.trim();save();renderPersonaHint()});function renderPersonaHint(){const v=$('speechVoice').value,c=P[v]||P.warm;$('speechVoiceInfo').textContent=(c.gender==='f'?'Đang chọn giọng NỮ':'Đang chọn giọng NAM')+' · '+($('speechPersonaId').value.trim()?'Có ID lưu sẵn; cần bật “Dùng Voice Persona ID nâng cao” mới gửi ID.':'Chưa có Voice Persona ID: Suno chỉ nhận mô tả chất giọng.')};$('speechEnabled')?.addEventListener('change',syncSpeech);$('speechPrepare')?.addEventListener('click',prepare);$('speechGo')?.addEventListener('click',start);render()});
 })();
 </script>
 </body>
