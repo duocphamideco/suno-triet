@@ -665,10 +665,17 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
   <section class="speech-studio" id="speechStudio">
     <div class="speech-toolbar"><div><h2>🎙️ SPEECH · Lời nói & nhạc nền</h2><div class="speech-sub">Tâm sự, podcast, lời dẫn truyền cảm với nhạc minh họa · Suno V6 qua Kie.ai</div></div><label style="display:flex;align-items:center;gap:9px;font-weight:700"><input type="checkbox" id="speechEnabled" style="width:19px;height:19px"> Bật chế độ Speech</label></div>
     <div class="speech-grid">
-      <div><label class="lb" for="speechVoice">Phong cách giọng nói</label><select id="speechVoice"><option value="warm">Nam trầm ấm, gần gũi</option><option value="female">Nữ dịu dàng, ấm áp</option><option value="mature">Nam trưởng thành, từng trải</option><option value="gentle">Nữ nhẹ nhàng, thủ thỉ</option><option value="story">Giọng kể chuyện giàu biểu cảm</option><option value="meditation">Giọng chậm, tĩnh tại</option></select></div>
+      <div><label class="lb" for="speechVoice">Chọn giọng đọc</label><select id="speechVoice"><optgroup label="Giọng NAM"><option value="warm">Nam ấm áp · trung trầm</option><option value="bass">Nam trầm sâu · điện ảnh</option><option value="mature">Nam từng trải · khàn nhẹ</option><option value="youngmale">Nam trẻ · sáng, tự nhiên</option><option value="southernmale">Nam miền Nam · thân mật</option></optgroup><optgroup label="Giọng NỮ"><option value="female">Nữ ấm áp · dịu dàng</option><option value="gentle">Nữ thủ thỉ · nhẹ, mềm</option><option value="youngfemale">Nữ trẻ · trong sáng</option><option value="maturefemale">Nữ trưởng thành · đằm thắm</option><option value="southernfemale">Nữ miền Nam · gần gũi</option></optgroup></select></div>
       <div><label class="lb" for="speechMusic">Nhạc minh họa</label><select id="speechMusic"><option value="piano">Piano nhẹ nhàng, sâu lắng</option><option value="acoustic">Guitar acoustic mộc mạc</option><option value="cinematic">Điện ảnh, dây êm dịu</option><option value="ambient">Ambient thư giãn, thiền định</option><option value="bolero">Bolero không lời, trữ tình</option><option value="rain">Piano và không khí mưa</option><option value="none">Rất ít nhạc nền</option></select></div>
       <div><label class="lb" for="speechEmotion">Cảm xúc</label><select id="speechEmotion"><option value="intimate">Tâm sự thân mật, đồng cảm</option><option value="moving">Xúc động, lắng đọng</option><option value="uplifting">Động viên, ấm áp, hy vọng</option><option value="reflective">Chiêm nghiệm, suy tư</option><option value="calm">Bình yên, thư thái</option></select></div>
       <div><label class="lb" for="speechPauses">Khoảng lặng</label><select id="speechPauses"><option value="natural">Tự nhiên</option><option value="long">Dài, nhiều điểm dừng</option><option value="short">Ngắn, mạch lạc</option></select></div>
+    </div>
+    <div class="speech-voice-lock" style="margin-top:14px;padding:13px;border:1px solid #cbd5e1;border-radius:12px;background:#fff">
+      <label style="display:flex;gap:8px;align-items:center;font-weight:700"><input type="checkbox" id="speechVoiceLock" checked style="width:18px;height:18px"> Ưu tiên giữ chất giọng đã chọn</label>
+      <div class="hint" style="margin:7px 0">Giọng trong danh sách là mô tả để Suno định hướng. Để tái sử dụng một giọng cụ thể giữa nhiều bản, nhập Voice Persona ID của Kie.ai (nếu có). Suno không bảo đảm khóa tuyệt đối khi chỉ dùng prompt.</div>
+      <label class="lb" for="speechPersonaId">Voice Persona ID cho giọng này (tùy chọn)</label>
+      <input id="speechPersonaId" type="text" autocomplete="off" spellcheck="false" placeholder="Dán Persona ID để giữ cùng một chất giọng">
+      <div class="hint" id="speechVoiceInfo" style="margin-top:7px"></div>
     </div>
     <div class="speech-actions"><button type="button" class="btn solid" id="speechPrepare">↗ Chuyển lời thành kịch bản Speech</button><button type="button" class="btn quiet" id="speechGo">🎙️ Tạo lời nói + nhạc</button></div>
     <div class="speech-notice" id="speechHelp">Dán bài nói tại mục “Lời” bên dưới. Tính năng thử nghiệm qua API tạo nhạc Suno V6; AI đôi khi vẫn có thể hát thay vì đọc. Giữ nguyên các chức năng tạo nhạc cũ.</div>
@@ -2487,11 +2494,15 @@ async function generate(){
     if(v&&v.g) input.vocal_gender=v.g; // m / f: tăng xác suất, không phải cam kết tuyệt đối
   }
 
-  if(speechOn) input.vocal_gender = ["female","gentle"].includes($("speechVoice").value) ? "f" : "m";
+  if(speechOn){
+    const sv=window.speechVoicePresets?.[$('speechVoice').value];
+    if(sv) input.vocal_gender=sv.gender;
+  }
   const sw=parseFloat($('styleWeight').value);
   const hardVoice=!!($('strictVoice')&&$('strictVoice').checked&&!instrumental&&S.duet==='solo'&&voiceGender());
   const hardInstr=!!($('strictArrangement')&&$('strictArrangement').checked&&S.instr.length);
-  const strictOn=hardVoice||hardInstr||!!$('solo').value;
+  const speechVoiceLocked=speechOn&&!!$('speechVoiceLock')?.checked;
+  const strictOn=hardVoice||hardInstr||!!$('solo').value||speechVoiceLocked;
   if(!isNaN(sw)) input.style_weight=Math.max(0,Math.min(1,strictOn?1.00:sw));
   const wc=parseFloat($('weird').value);
   if(!isNaN(wc)) input.weirdness_constraint=Math.max(0,Math.min(1,strictOn?0.00:wc));
@@ -2507,9 +2518,11 @@ async function generate(){
   }
   const personaId=$('personaId')?$('personaId').value.trim():'';
   const personaModel=$('personaModel')?$('personaModel').value:'';
-  if(personaId){
-    input.persona_id=personaId;
-    if(personaModel) input.persona_model=personaModel;
+  const speechPersonaId=speechOn&&$('speechVoiceLock')?.checked ? ($('speechPersonaId')?.value||'').trim() : '';
+  const usedPersonaId=speechPersonaId||(!speechOn?personaId:'');
+  if(usedPersonaId){
+    input.persona_id=usedPersonaId;
+    input.persona_model=speechPersonaId?'voice_persona':(personaModel||'style_persona');
   }
 
   const durRaw=$('duration').value.trim();
@@ -2543,11 +2556,15 @@ async function generate(){
       // Persona là tuỳ chọn. Nếu ID đã bị xoá/hết hiệu lực trên Suno/Kie,
       // tự bỏ Persona và gửi lại một lần để không chặn toàn bộ thao tác Tạo nhạc.
       const msg=String(firstErr&&firstErr.message||firstErr||'');
-      const personaMissing=!!personaId && /persona/i.test(msg) && /(not\s*found|does\s*not\s*exist|doesn['’]?t\s*exist|không\s*tồn\s*tại|invalid|unknown)/i.test(msg);
+      const personaMissing=!!usedPersonaId && /persona/i.test(msg) && /(not\s*found|does\s*not\s*exist|doesn['’]?t\s*exist|không\s*tồn\s*tại|invalid|unknown)/i.test(msg);
       if(!personaMissing) throw firstErr;
 
       delete input.persona_id;
       delete input.persona_model;
+      if(speechPersonaId){
+        status('bad','Voice Persona không hợp lệ','Kiểm tra lại Voice Persona ID. Không tự thay bằng một giọng khác khi đang khóa giọng.');
+        throw firstErr;
+      }
       if($('personaId')) $('personaId').value='';
       if($('personaModel')) $('personaModel').value='';
       try{ persist(); }catch(_e){}
@@ -5436,15 +5453,30 @@ body.mvx-workspace #mvTab{inset:0!important;z-index:120;height:var(--mvx-vh,100d
 <script id="speech-mode-script">
 (function(){
  const $=id=>document.getElementById(id);
- const voices={warm:'warm low male speaking voice, conversational Southern Vietnamese-friendly cadence',female:'warm gentle female speaking voice, tender and natural',mature:'mature deep male speaking voice, thoughtful resonant delivery',gentle:'soft intimate female speaking voice, unhurried natural phrasing',story:'expressive storytelling narrator, cinematic but human voice',meditation:'calm slow reflective narrator, mindful breathing and silence'};
+ const P={
+  warm:{gender:'m',desc:'single adult MALE baritone speaking voice, warm medium-low pitch, smooth rounded resonance, reassuring intimate conversational delivery, NOT ultra deep'},
+  bass:{gender:'m',desc:'single adult MALE deep bass narrator, unmistakably very low chest resonance, textured cinematic gravity, slow weighty vowels'},
+  mature:{gender:'m',desc:'single older adult MALE mature slightly husky speaking voice, mid-low pitch, weathered natural breath, thoughtful reflective tone'},
+  youngmale:{gender:'m',desc:'single young adult MALE speaking voice, bright mid-high male register, clear forward resonance, lively casual diction, NOT deep bass'},
+  southernmale:{gender:'m',desc:'single adult MALE warm medium-pitch Southern Vietnamese conversational narrator, relaxed approachable phrasing, warm friendly energy'},
+  female:{gender:'f',desc:'single adult FEMALE alto speaking voice, warm rich mid-low feminine register, gentle and reassuring, clearly FEMALE throughout'},
+  gentle:{gender:'f',desc:'single adult FEMALE soft airy soprano speaking voice, delicate quiet whispery intimate narration, distinctly feminine light high register'},
+  youngfemale:{gender:'f',desc:'single young adult FEMALE bright clear mezzo-soprano speaking voice, youthful fresh lively higher pitch, clearly FEMALE'},
+  maturefemale:{gender:'f',desc:'single mature adult FEMALE low warm contralto speaking voice, elegantly poised textured mature feminine resonance, clearly FEMALE'},
+  southernfemale:{gender:'f',desc:'single adult FEMALE warm Southern Vietnamese conversational speaking voice, relaxed natural Southern Vietnamese inflection, friendly feminine register'}
+ };
+ window.speechVoicePresets=P;
  const musics={piano:'soft minimalist piano underscore',acoustic:'gentle fingerpicked acoustic guitar underscore',cinematic:'soft cinematic strings and subtle piano underscore',ambient:'airy peaceful ambient instrumental background',bolero:'gentle instrumental Vietnamese bolero backing, no singing',rain:'quiet rain ambience and sparse soft piano',none:'almost no backing instruments, subtle atmospheric bed'};
  const emotions={intimate:'intimate empathetic conversational storytelling',moving:'deeply moving heartfelt delivery',uplifting:'warm encouraging hopeful narration',reflective:'reflective contemplative storytelling',calm:'peaceful restful comforting narration'};
- window.speechBuildStyle=function(){let t=[voices[$('speechVoice').value],musics[$('speechMusic').value],emotions[$('speechEmotion').value],'spoken word, narration only, natural speech NOT singing, Vietnamese narration with accurate tones, meaningful emotional pauses, music kept quietly underneath narration, no sung chorus, no rap', 'clear foreground narration, gentle background soundtrack'];if($('speechPauses').value==='long')t.push('extended thoughtful pauses and spacious timing');if($('speechPauses').value==='short')t.push('short natural pauses, flowing storytelling');return t.filter(Boolean).join(', ').slice(0,1000)};
- window.speechBuildLyrics=function(raw){raw=String(raw||'').trim();if(!raw)return '';raw=raw.replace(/\[(Verse|Chorus|Bridge|Hook|Pre-Chorus|Outro|Intro)[^\]]*\]/gi,'[Spoken Word]');if(!/^\[(spoken|narrat|whisper)/i.test(raw))raw='[Spoken Word - spoken narration, never sing]\n'+raw;return raw};
- function syncSpeech(){const on=$('speechEnabled').checked;$('speechStudio').classList.toggle('speech-active',on);if(on){$('instrumental').checked=false;const st=$('speechHelp');st.textContent='Đã bật Speech. Nhập lời ở mục “Lời”, chọn giọng và nhạc rồi bấm “Tạo lời nói + nhạc”. Không bảo đảm Suno đọc 100% thay vì hát.';}}
- function prepare(){ $('speechEnabled').checked=true;syncSpeech();$('instrumental').checked=false;const t=$('lyrics');if(t.value.trim()){t.value=window.speechBuildLyrics(t.value);t.dispatchEvent(new Event('input',{bubbles:true}))}t.scrollIntoView({behavior:'smooth',block:'center'});t.focus();}
- function start(){ $('speechEnabled').checked=true;syncSpeech();if(!$('lyrics').value.trim()){prepare();alert('Anh nhập nội dung bài nói vào ô Lời trước khi tạo nhé.');return}if(!$('title').value.trim())$('title').value='Bài nói truyền cảm';$('genBtn').click();}
- document.addEventListener('DOMContentLoaded',()=>{ $('speechEnabled')?.addEventListener('change',syncSpeech);$('speechPrepare')?.addEventListener('click',prepare);$('speechGo')?.addEventListener('click',start); });
+ const key='triet_speech_voice_v2';let data={};try{data=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(_e){}
+ function save(){try{localStorage.setItem(key,JSON.stringify(data))}catch(_e){}}
+ function render(){const v=$('speechVoice')?.value||'warm',cfg=P[v]||P.warm; if($('speechPersonaId'))$('speechPersonaId').value=data.personas?.[v]||''; if($('speechVoiceInfo'))$('speechVoiceInfo').textContent=(cfg.gender==='f'?'Đang chọn giọng NỮ':'Đang chọn giọng NAM')+' · '+($('speechPersonaId')?.value?'Có Voice Persona ID được lưu cho kiểu giọng này.':'Chưa có Voice Persona ID: chỉ có thể ưu tiên bằng mô tả, không khóa danh tính giọng chính xác.');}
+ window.speechBuildStyle=function(){const v=$('speechVoice').value,voice=P[v]||P.warm,lock=$('speechVoiceLock')?.checked;const t=[lock?'VOICE IDENTITY PRIORITY: exactly ONE speaker from beginning to end, NO voice swaps, NO duets, NO pitch/gender changes':null,voice.desc,musics[$('speechMusic').value],emotions[$('speechEmotion').value],'spoken word only, natural spoken Vietnamese, not sung, accurate Vietnamese tones, expressive pauses, quiet instrumental music under foreground narration, no chorus, no rap, no singing'];if($('speechPauses').value==='long')t.push('long meaningful pauses');if($('speechPauses').value==='short')t.push('short flowing natural pauses');return t.filter(Boolean).join(', ').slice(0,1000)};
+ window.speechBuildLyrics=function(raw){raw=String(raw||'').trim();if(!raw)return '';raw=raw.replace(/\[(Verse|Chorus|Bridge|Hook|Pre-Chorus|Outro|Intro)[^\]]*\]/gi,'[Spoken Word]');const v=P[$('speechVoice')?.value]||P.warm,sex=v.gender==='f'?'female':'male';const cue='[Spoken Word: ONE '+sex+' speaking narrator throughout, spoken not sung]';if(/^\[(spoken|narrat|whisper)/i.test(raw))return raw.replace(/^\[[^\]]+\]/,cue);return cue+'\n'+raw};
+ function syncSpeech(){const on=$('speechEnabled').checked;$('speechStudio').classList.toggle('speech-active',on);if(on){$('instrumental').checked=false;$('speechHelp').textContent='Speech đang bật: chọn giọng NAM/NỮ, tùy chọn Persona ID để giữ chất giọng qua các lần tạo, sau đó tạo lời nói có nhạc. Suno vẫn có thể không tuân thủ hoàn toàn.';}render()}
+ function prepare(){$('speechEnabled').checked=true;syncSpeech();$('instrumental').checked=false;const t=$('lyrics');if(t.value.trim()){t.value=window.speechBuildLyrics(t.value);t.dispatchEvent(new Event('input',{bubbles:true}))}t.scrollIntoView({behavior:'smooth',block:'center'});t.focus()}
+ function start(){$('speechEnabled').checked=true;syncSpeech();if(!$('lyrics').value.trim()){prepare();alert('Anh nhập nội dung bài nói vào ô Lời trước khi tạo nhé.');return}if(!$('title').value.trim())$('title').value='Bài nói truyền cảm';$('genBtn').click()}
+ document.addEventListener('DOMContentLoaded',()=>{if(data.voice&&P[data.voice])$('speechVoice').value=data.voice;if(typeof data.lock==='boolean')$('speechVoiceLock').checked=data.lock;['speechVoice','speechVoiceLock'].forEach(id=>$(id)?.addEventListener('change',()=>{data.voice=$('speechVoice').value;data.lock=$('speechVoiceLock').checked;save();render()}));$('speechPersonaId')?.addEventListener('input',()=>{const v=$('speechVoice').value;data.personas=data.personas||{};data.personas[v]=$('speechPersonaId').value.trim();save();renderPersonaHint()});function renderPersonaHint(){const v=$('speechVoice').value,c=P[v]||P.warm;$('speechVoiceInfo').textContent=(c.gender==='f'?'Đang chọn giọng NỮ':'Đang chọn giọng NAM')+' · '+($('speechPersonaId').value.trim()?'Sẽ dùng Voice Persona ID đã nhập để yêu cầu cùng chất giọng.':'Chưa có Voice Persona ID: Suno chỉ nhận mô tả chất giọng.')};$('speechEnabled')?.addEventListener('change',syncSpeech);$('speechPrepare')?.addEventListener('click',prepare);$('speechGo')?.addEventListener('click',start);render()});
 })();
 </script>
 </body>
