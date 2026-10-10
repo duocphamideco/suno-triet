@@ -541,6 +541,9 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<style id="speech-mode-style">
+.speech-studio{border:1px solid #bfdbfe;background:linear-gradient(135deg,#eff6ff,#fff);border-radius:18px;padding:22px;box-shadow:0 3px 18px #0f172a0b}.speech-studio h2{font-size:1.3rem;margin:0 0 5px}.speech-sub{font-size:.84rem;color:#526079;margin-bottom:16px}.speech-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.speech-studio label.lb{margin-bottom:5px}.speech-studio .speech-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}.speech-studio .speech-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}.speech-studio .speech-notice{font-size:.78rem;color:#64748b;margin-top:10px}.speech-active{background:#dbeafe!important;border-color:#60a5fa!important}@media(max-width:650px){.speech-grid{grid-template-columns:1fr}.speech-studio{padding:16px}}
+</style>
 </head>
 <body>
 
@@ -658,6 +661,18 @@ input[type=text],input[type=password],input[type=number],textarea,select{backgro
     <button type="button" id="accExpandAll">Mở tất cả</button>
     <button type="button" id="accCollapseAll">Thu gọn tất cả</button>
   </div>
+
+  <section class="speech-studio" id="speechStudio">
+    <div class="speech-toolbar"><div><h2>🎙️ SPEECH · Lời nói & nhạc nền</h2><div class="speech-sub">Tâm sự, podcast, lời dẫn truyền cảm với nhạc minh họa · Suno V6 qua Kie.ai</div></div><label style="display:flex;align-items:center;gap:9px;font-weight:700"><input type="checkbox" id="speechEnabled" style="width:19px;height:19px"> Bật chế độ Speech</label></div>
+    <div class="speech-grid">
+      <div><label class="lb" for="speechVoice">Phong cách giọng nói</label><select id="speechVoice"><option value="warm">Nam trầm ấm, gần gũi</option><option value="female">Nữ dịu dàng, ấm áp</option><option value="mature">Nam trưởng thành, từng trải</option><option value="gentle">Nữ nhẹ nhàng, thủ thỉ</option><option value="story">Giọng kể chuyện giàu biểu cảm</option><option value="meditation">Giọng chậm, tĩnh tại</option></select></div>
+      <div><label class="lb" for="speechMusic">Nhạc minh họa</label><select id="speechMusic"><option value="piano">Piano nhẹ nhàng, sâu lắng</option><option value="acoustic">Guitar acoustic mộc mạc</option><option value="cinematic">Điện ảnh, dây êm dịu</option><option value="ambient">Ambient thư giãn, thiền định</option><option value="bolero">Bolero không lời, trữ tình</option><option value="rain">Piano và không khí mưa</option><option value="none">Rất ít nhạc nền</option></select></div>
+      <div><label class="lb" for="speechEmotion">Cảm xúc</label><select id="speechEmotion"><option value="intimate">Tâm sự thân mật, đồng cảm</option><option value="moving">Xúc động, lắng đọng</option><option value="uplifting">Động viên, ấm áp, hy vọng</option><option value="reflective">Chiêm nghiệm, suy tư</option><option value="calm">Bình yên, thư thái</option></select></div>
+      <div><label class="lb" for="speechPauses">Khoảng lặng</label><select id="speechPauses"><option value="natural">Tự nhiên</option><option value="long">Dài, nhiều điểm dừng</option><option value="short">Ngắn, mạch lạc</option></select></div>
+    </div>
+    <div class="speech-actions"><button type="button" class="btn solid" id="speechPrepare">↗ Chuyển lời thành kịch bản Speech</button><button type="button" class="btn quiet" id="speechGo">🎙️ Tạo lời nói + nhạc</button></div>
+    <div class="speech-notice" id="speechHelp">Dán bài nói tại mục “Lời” bên dưới. Tính năng thử nghiệm qua API tạo nhạc Suno V6; AI đôi khi vẫn có thể hát thay vì đọc. Giữ nguyên các chức năng tạo nhạc cũ.</div>
+  </section>
 
   <!-- 01 -->
   <section class="sec" id="s1">
@@ -2431,7 +2446,8 @@ async function generate(){
   }
   const finalModel=['V6','V6_WILD'].includes(model)?model:'V6';
   // V6 / V6 Wild: style tối đa 1000 ký tự, lyrics tối đa 5000 ký tự.
-  const style=compactStyleText(effectiveStyle(),STYLE_SAFE_MAX_V6);
+  const speechOn=!!(document.getElementById("speechEnabled")?.checked);
+  const style=compactStyleText(speechOn ? speechBuildStyle() : effectiveStyle(),STYLE_SAFE_MAX_V6);
   if(!title){ status('bad','Thiếu tiêu đề','Nhập tiêu đề bài hát ở mục 01'); return; }
   if(title.length>80){ status('bad','Tiêu đề quá dài','Suno V6 cho phép tối đa 80 ký tự.'); return; }
   if(!style){ status('bad','Thiếu style','Chọn ít nhất một thể loại ở mục 01'); return; }
@@ -2440,7 +2456,7 @@ async function generate(){
   if(!instrumental && prompt.length>5000){ status('bad','Lời quá dài','V6 / V6 Wild cho phép tối đa 5000 ký tự Lyrics.'); return; }
 
   // Khi chọn kiểu ĐỌC/NÓI: đổi nhãn đoạn hát sang nhãn spoken để hạn chế Suno tự hát.
-  let prompt2=prompt;
+  let prompt2=speechOn ? speechBuildLyrics($("lyrics").value.trim()) : prompt;
   const spokenPicked=(!instrumental)? S.delivery.filter(l=>SPOKEN_DELIVERY[l]) : [];
   if(spokenPicked.length && prompt2){
     const spTag=S.delivery.includes('Thì thầm')?'[Whispered Spoken]':'[Spoken Word]';
@@ -2464,13 +2480,14 @@ async function generate(){
     title
   };
   if(!instrumental) input.lyrics=prompt2;
-  const neg=effectiveNegativeTags().slice(0,NEG_STYLE_MAX); if(neg) input.negative_tags=neg;
+  const neg=(speechOn ? "singing, sung vocals, chorus, rap flow, melodic vocalization, overpowering music, loud drums" : effectiveNegativeTags()).slice(0,NEG_STYLE_MAX); if(neg) input.negative_tags=neg;
 
   if(!instrumental && S.duet==='solo'){
     const v=VOICE.find(x=>x.l===S.voice);
     if(v&&v.g) input.vocal_gender=v.g; // m / f: tăng xác suất, không phải cam kết tuyệt đối
   }
 
+  if(speechOn) input.vocal_gender = ["female","gentle"].includes($("speechVoice").value) ? "f" : "m";
   const sw=parseFloat($('styleWeight').value);
   const hardVoice=!!($('strictVoice')&&$('strictVoice').checked&&!instrumental&&S.duet==='solo'&&voiceGender());
   const hardInstr=!!($('strictArrangement')&&$('strictArrangement').checked&&S.instr.length);
@@ -5416,5 +5433,19 @@ body.mvx-workspace #mvTab{inset:0!important;z-index:120;height:var(--mvx-vh,100d
 @media(max-width:960px) and (max-height:500px){#mvTab .mvx{grid-template-rows:48px minmax(90px,1fr) minmax(100px,1fr) auto}#mvTab .mvx-phone-dock button{min-height:44px}#mvTab .mvx-phone-dock button span{display:inline;font-size:16px;margin-right:4px}#mvTab .mvx-side{height:94%}}
 </style>
 
+<script id="speech-mode-script">
+(function(){
+ const $=id=>document.getElementById(id);
+ const voices={warm:'warm low male speaking voice, conversational Southern Vietnamese-friendly cadence',female:'warm gentle female speaking voice, tender and natural',mature:'mature deep male speaking voice, thoughtful resonant delivery',gentle:'soft intimate female speaking voice, unhurried natural phrasing',story:'expressive storytelling narrator, cinematic but human voice',meditation:'calm slow reflective narrator, mindful breathing and silence'};
+ const musics={piano:'soft minimalist piano underscore',acoustic:'gentle fingerpicked acoustic guitar underscore',cinematic:'soft cinematic strings and subtle piano underscore',ambient:'airy peaceful ambient instrumental background',bolero:'gentle instrumental Vietnamese bolero backing, no singing',rain:'quiet rain ambience and sparse soft piano',none:'almost no backing instruments, subtle atmospheric bed'};
+ const emotions={intimate:'intimate empathetic conversational storytelling',moving:'deeply moving heartfelt delivery',uplifting:'warm encouraging hopeful narration',reflective:'reflective contemplative storytelling',calm:'peaceful restful comforting narration'};
+ window.speechBuildStyle=function(){let t=[voices[$('speechVoice').value],musics[$('speechMusic').value],emotions[$('speechEmotion').value],'spoken word, narration only, natural speech NOT singing, Vietnamese narration with accurate tones, meaningful emotional pauses, music kept quietly underneath narration, no sung chorus, no rap', 'clear foreground narration, gentle background soundtrack'];if($('speechPauses').value==='long')t.push('extended thoughtful pauses and spacious timing');if($('speechPauses').value==='short')t.push('short natural pauses, flowing storytelling');return t.filter(Boolean).join(', ').slice(0,1000)};
+ window.speechBuildLyrics=function(raw){raw=String(raw||'').trim();if(!raw)return '';raw=raw.replace(/\[(Verse|Chorus|Bridge|Hook|Pre-Chorus|Outro|Intro)[^\]]*\]/gi,'[Spoken Word]');if(!/^\[(spoken|narrat|whisper)/i.test(raw))raw='[Spoken Word - spoken narration, never sing]\n'+raw;return raw};
+ function syncSpeech(){const on=$('speechEnabled').checked;$('speechStudio').classList.toggle('speech-active',on);if(on){$('instrumental').checked=false;const st=$('speechHelp');st.textContent='Đã bật Speech. Nhập lời ở mục “Lời”, chọn giọng và nhạc rồi bấm “Tạo lời nói + nhạc”. Không bảo đảm Suno đọc 100% thay vì hát.';}}
+ function prepare(){ $('speechEnabled').checked=true;syncSpeech();$('instrumental').checked=false;const t=$('lyrics');if(t.value.trim()){t.value=window.speechBuildLyrics(t.value);t.dispatchEvent(new Event('input',{bubbles:true}))}t.scrollIntoView({behavior:'smooth',block:'center'});t.focus();}
+ function start(){ $('speechEnabled').checked=true;syncSpeech();if(!$('lyrics').value.trim()){prepare();alert('Anh nhập nội dung bài nói vào ô Lời trước khi tạo nhé.');return}if(!$('title').value.trim())$('title').value='Bài nói truyền cảm';$('genBtn').click();}
+ document.addEventListener('DOMContentLoaded',()=>{ $('speechEnabled')?.addEventListener('change',syncSpeech);$('speechPrepare')?.addEventListener('click',prepare);$('speechGo')?.addEventListener('click',start); });
+})();
+</script>
 </body>
 </html>
